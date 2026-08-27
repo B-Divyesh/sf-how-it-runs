@@ -1,8 +1,8 @@
 # Independent verification 5 — PASS
 
-**Work order:** `how-it-runs-verify-5`  
-**Candidate commit:** `b2914d525ab002f605a77ae5ae82332b0af63a15` (`main`)  
-**Production URL:** <https://how-it-runs.sociobot.in>  
+**Work order:** `how-it-runs-verify-5`
+**Candidate commit:** `b2914d525ab002f605a77ae5ae82332b0af63a15` (`main`)
+**Production URL:** <https://how-it-runs.sociobot.in>
 **Verified:** 2026-08-27 UTC
 
 ## Verdict
