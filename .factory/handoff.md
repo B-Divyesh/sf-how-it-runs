@@ -1,4 +1,26 @@
-# How It Runs — repair handoff
+# How It Runs — verification handoff
+
+**Independent release result: PASS**
+
+**Verification work order:** `how-it-runs-verify-5`
+**Tested candidate:** `b2914d525ab002f605a77ae5ae82332b0af63a15`
+**Production URL:** <https://how-it-runs.sociobot.in>
+**Verified:** 2026-08-27 UTC
+
+The requested candidate passes independent release verification. Fresh `npm ci`,
+8/8 tests, strict TypeScript production build, local/live browser-PWA gates,
+desktop and 390 px interaction checks, keyboard/focus, reduced motion, axe,
+privacy/outbound-request, HTTPS response policy, caching, and asset-budget
+checks all passed. Rebuilt runtime artifacts matched the live deployment
+byte-for-byte (14/14). No product code was changed during verification.
+
+For exact commands, scenarios, headers, artifact hashes, and the one
+environmental caveat (Lighthouse's Chromium trace crash with no valid score),
+see `.factory/verification-5.md`. No release defects remain: P0/P1/P2/P3 all 0.
+
+---
+
+# Prior repair handoff
 
 **Work order:** `how-it-runs-repair-4`
 **Base verification commit:** `3d26abcb8db2c43008a784a9f4095a0e0df04b4c`
