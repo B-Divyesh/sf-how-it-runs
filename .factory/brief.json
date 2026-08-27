@@ -1,0 +1,8 @@
+{
+  "slug": "how-it-runs",
+  "title": "How It Runs",
+  "artifact_class": "static-web",
+  "smallest_useful_product": "A shared flow engine with municipal water treatment, a small power grid, and a bakery production line; three to four levers, throughput/quality/cost outcomes, targets, unlocked faults, watch mode, and URL state.",
+  "monetization": "free",
+  "constraints": ["under five minutes", "touch friendly", "original art", "honest simplified models"]
+}
