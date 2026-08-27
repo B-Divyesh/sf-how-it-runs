@@ -49,12 +49,23 @@ if (serious.length) {
 }
 if (errors.length) throw new Error(`Browser errors: ${errors.join('; ')}`);
 
+await page.evaluate(async () => { await navigator.serviceWorker.ready; });
+if (!await page.evaluate(() => Boolean(navigator.serviceWorker.controller))) {
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
+}
+await context.setOffline(true);
+await page.reload({ waitUntil: 'domcontentloaded' });
+await page.getByRole('heading', { name: 'Clean water works' }).first().waitFor();
+await context.setOffline(false);
+
 console.log(JSON.stringify({
   route: 'water',
   targetReached: true,
   faultUnlocked: true,
   watchModePaused: true,
   mobileOverflow: false,
+  offlineReload: true,
   axeViolations: axe.violations.length,
   seriousOrCritical: serious.length,
   consoleErrors: errors.length,

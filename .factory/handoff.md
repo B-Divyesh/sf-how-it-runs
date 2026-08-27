@@ -37,16 +37,17 @@ The exact factory build command is `npm run build`; output is `dist/` and
 Verification on 2026-08-27:
 
 - `npm test`: 7/7 engine and shared-definition tests passed.
-- `npm run build`: passed; initial bundle is 19.01 KB JS and 20.02 KB CSS raw
+- `npm run build`: passed; initial bundle is 19.06 KB JS and 20.02 KB CSS raw
   (7.24 KB and 5.44 KB gzip respectively).
 - Browser scenario at 390×844: all three documented targets reached and all three
   faults unlocked; water fault activated; watch mode started/paused; keyboard skip
-  link passed; no horizontal page overflow; 0 console errors.
+  link passed; repeat-visit offline reload passed; no horizontal page overflow; 0
+  console errors.
 - Playwright axe: 0 violations (therefore 0 serious/critical).
 - Factory `verify-url.sh`: HTTP 200, title/lang/main/alt/button checks passed,
   exactly one `h1`, 0 console errors.
 - Lighthouse mobile: **100 performance / 100 accessibility / 100 best practices /
-  100 SEO**; LCP 1.4 s, CLS 0, total blocking time 0 ms.
+  100 SEO**; LCP 1.4 s, CLS 0, total blocking time 20 ms.
 - `npm audit`: 0 vulnerabilities.
 
 ## Privacy and operating notes
