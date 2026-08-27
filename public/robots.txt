@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://how-it-runs.sociobot.in/sitemap.xml
