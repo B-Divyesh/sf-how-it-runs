@@ -46,8 +46,9 @@ checking and writes the static deployment to `dist/`, with `dist/index.html` at 
 root. `npm run preview` serves that exact directory using the same Static Web Apps
 navigation and cache rules committed for deployment. `verify:browser` expects that
 preview server to be running and exercises all three targets plus the water fault,
-watch-mode pause, keyboard skip-link focus, mobile overflow, axe accessibility,
-offline reload/module MIME behavior, cache headers, and browser console.
+the exact Watch-mode Enter-then-Space pause path, unknown-route URL recovery,
+keyboard skip-link focus, mobile overflow, axe accessibility, offline reload/module
+MIME behavior, cache headers, and browser console.
 
 ## Product behavior
 

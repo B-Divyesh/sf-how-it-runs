@@ -28,6 +28,41 @@ const main = requireElement<HTMLElement>('#main');
 let watchTimer: number | undefined;
 let toastTimer: number | undefined;
 
+type SimulatorFocus =
+  | { kind: 'action'; action: string }
+  | { kind: 'lever'; id: string }
+  | { kind: 'flow-line' };
+
+function getSimulatorFocus(): SimulatorFocus | null {
+  const activeElement = document.activeElement;
+  if (!(activeElement instanceof HTMLElement) || !simulator.contains(activeElement)) return null;
+
+  if (activeElement.matches('button[data-action]')) {
+    return { kind: 'action', action: activeElement.dataset.action! };
+  }
+  if (activeElement.matches('input[data-lever-index]')) {
+    return { kind: 'lever', id: activeElement.id };
+  }
+  if (activeElement.matches('.flow-line')) return { kind: 'flow-line' };
+  return null;
+}
+
+function restoreSimulatorFocus(focus: SimulatorFocus | null): void {
+  if (!focus) return;
+
+  if (focus.kind === 'action') {
+    const control = [...simulator.querySelectorAll<HTMLButtonElement>('button[data-action]')]
+      .find((button) => button.dataset.action === focus.action);
+    control?.focus({ preventScroll: true });
+    return;
+  }
+  if (focus.kind === 'lever') {
+    simulator.querySelector<HTMLInputElement>(`#${focus.id}`)?.focus({ preventScroll: true });
+    return;
+  }
+  simulator.querySelector<HTMLOListElement>('.flow-line')?.focus({ preventScroll: true });
+}
+
 // A fragment alone does not consistently move keyboard focus. Keep the target
 // programmatically focusable and explicitly land there after the browser updates
 // the hash, without adding it to the normal tab order.
@@ -95,6 +130,7 @@ function outcomeMarkup(label: string, value: number, unit: string, kind: string)
 }
 
 function renderSimulator(announce = false): void {
+  const focus = getSimulatorFocus();
   if (!state.systemId) {
     simulator.innerHTML = `
       <div class="empty-stage" id="empty-stage">
@@ -102,6 +138,7 @@ function renderSimulator(announce = false): void {
         <h2>Your control desk is ready</h2>
         <p>Choose one of the three routes above to start. Each trip takes about five minutes.</p>
       </div>`;
+    updateUrl();
     return;
   }
 
@@ -208,6 +245,7 @@ function renderSimulator(announce = false): void {
     </div>`;
 
   if (announce) simulator.focus({ preventScroll: true });
+  else restoreSimulatorFocus(focus);
   updateUrl();
 }
 
@@ -344,7 +382,9 @@ updateOnlineState();
 renderRoutes();
 renderSimulator();
 
-if (requestedSystem && !initialId) showToast('That route does not exist, so we brought you back to departures.');
+if (requestedSystem !== null && !initialId) {
+  showToast('That route does not exist, so we brought you back to departures.');
+}
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {

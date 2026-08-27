@@ -53,6 +53,28 @@ await page.getByRole('button', { name: /Watch it run/ }).click();
 await page.getByRole('button', { name: /Pause watch mode/ }).waitFor();
 await page.getByRole('button', { name: /Pause watch mode/ }).click();
 
+await page.goto(`${base}/?system=water&set=65,65,60`, { waitUntil: 'networkidle' });
+const watchControl = page.getByRole('button', { name: 'Watch it run' });
+await watchControl.focus();
+await page.keyboard.press('Enter');
+const pauseControl = page.getByRole('button', { name: 'Pause watch mode' });
+await pauseControl.waitFor();
+if (!await pauseControl.evaluate((button) => document.activeElement === button)) {
+  throw new Error('Watch mode did not retain keyboard focus on Pause watch mode after Enter.');
+}
+await page.keyboard.press('Space');
+await page.getByRole('button', { name: 'Watch it run' }).waitFor();
+if (!await page.getByRole('button', { name: 'Watch it run' }).evaluate((button) => document.activeElement === button)) {
+  throw new Error('Watch mode did not retain keyboard focus after pausing with Space.');
+}
+
+await page.goto(`${base}/?system=does-not-exist&set=1,2,3`, { waitUntil: 'networkidle' });
+await page.getByRole('heading', { name: 'Your control desk is ready' }).waitFor();
+const recoveredUrl = new URL(page.url());
+if (recoveredUrl.search || recoveredUrl.hash) {
+  throw new Error(`Unknown system recovery retained an invalid share URL: ${page.url()}`);
+}
+
 const horizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
 if (horizontalOverflow) throw new Error('Page has horizontal overflow at 390px.');
 
@@ -90,6 +112,8 @@ console.log(JSON.stringify({
   targetReached: true,
   faultUnlocked: true,
   watchModePaused: true,
+  enterThenSpaceWatchControl: true,
+  unknownRouteUrlNormalized: true,
   mobileOverflow: false,
   offlineReload: true,
   offlineModuleJavaScript: true,
