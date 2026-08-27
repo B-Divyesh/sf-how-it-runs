@@ -2,6 +2,7 @@
 
 **Work order:** `how-it-runs-repair-1`
 **Repaired candidate:** `95357f6d2aba56356d78a524a24fc550f0201ee7`
+**Repair commit:** `8b62ce0430bd8ff849e35a30825d994057ec60e3`
 **Deployment class:** Standard static only
 
 ## What changed
@@ -65,6 +66,12 @@ any server/runtime or paid deployment feature.
   100/100/100/100 (performance/accessibility/best-practices/SEO; LCP 1.3 s,
   CLS 0, TBT 0 ms). The non-Lighthouse mobile/axe/browser checks above were rerun
   after this repair.
+- Standard static deployment: uploaded successfully to
+  `https://how-it-runs.sociobot.in`. Post-deploy browser quality gate and
+  `verify-url.sh` both passed against the live URL with the same 390 px, axe,
+  offline-module, focus, update-contract, cache-header, and zero-console-error
+  results. Live headers matched the expected shell, hashed-asset, and `sw.js`
+  policies above.
 
 ## Privacy and known limits
 
