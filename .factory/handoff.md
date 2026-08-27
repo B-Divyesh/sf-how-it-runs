@@ -1,33 +1,40 @@
-# How It Runs — repair handoff
+# How It Runs — independent verification handoff
 
-**Work order:** `how-it-runs-repair-1`
-**Repaired candidate:** `95357f6d2aba56356d78a524a24fc550f0201ee7`
-**Repair commit:** `8b62ce0430bd8ff849e35a30825d994057ec60e3`
-**Deployment class:** Standard static only
+**Work order:** `how-it-runs-verify-2`
+**Tested candidate:** `ac0d806bc60db7b8494fe9661937793101c9c711`
+**Tested deployment:** <https://how-it-runs.sociobot.in>
+**Verified:** 2026-08-27 UTC
+**Verdict: FAIL**
 
-## What changed
+## What was verified
 
-- Fixed the keyboard skip link: `main#main` is programmatically focusable and the
-  skip-link activation explicitly transfers focus there while retaining `#main`.
-- Replaced the broad service-worker HTML fallback. Navigation requests use a
-  network-first shell with offline shell fallback; static assets are cache-first;
-  failed module/assets requests never receive HTML. The cache is versioned to v3,
-  and install fetches a revalidated shell.
-- Added Static Web Apps cache routes: content-hashed `/assets/*` receive
-  `public, max-age=31536000, immutable`; HTML shells revalidate; `sw.js` is
-  `no-cache, no-store, must-revalidate` so updates are discovered safely.
-- Replaced the local Vite preview command with a small production-static preview
-  server that serves `dist/` and applies the committed Static Web Apps fallback,
-  MIME, security, and cache rules. This makes the documented browser gate test the
-  deployment artifact and cache behavior, rather than an approximation.
-- Expanded `verify:browser` regressions for skip-link focus, immutable asset
-  headers, shell/service-worker revalidation headers, and an offline module
-  response that must remain JavaScript rather than HTML.
+The candidate was installed from a clean checkout and checked with `npm test`, the
+exact `npm run build`, production-static local preview, and the repository browser
+gate locally and against the live deployment. The deployed shell, worker, legal
+pages, all hero variants, and both hashed build assets are byte-for-byte equal to
+the fresh `dist/` artifact.
 
-The municipal water, neighborhood power-grid, and bakery simulations remain shared
-typed engine flows and were all exercised at their documented steady targets.
+All three simulations reach their stated targets and fault recoveries; 390 px and
+desktop exercise passed; the live PWA works offline after installation; axe found
+0 serious/critical (0 total) violations; no console errors, third-party requests,
+cookies, local/session storage, or tracking were observed. Hashed JS/CSS cache
+immutably, while shell and worker responses revalidate. Initial JS/CSS are below
+the static budgets. See `.factory/verification-2.md` for exact commands and
+evidence.
 
-## Run and verify
+## Blocking issue
+
+**P1 — keyboard focus is discarded when Watch mode starts.** After a keyboard user
+focuses **Watch it run** and presses Enter, the re-rendered **Pause watch mode**
+button is present but focus moves to `<body>`. An immediate Space does not pause
+the run. This fails continuous keyboard-only operation of the required Watch/pause
+feature. Refocus the replacement action after rendering and add an Enter-then-Space
+regression before accepting the release.
+
+There is also a P3 URL-recovery polish issue: an unknown system route displays the
+departures recovery UI but leaves its invalid query in the address bar.
+
+## Re-run
 
 ```sh
 npm ci
@@ -35,48 +42,8 @@ npm test
 npm run build
 npm run preview -- --port 4173
 npm run verify:browser -- http://127.0.0.1:4173
+npm run verify:browser -- https://how-it-runs.sociobot.in
 ```
 
-The production artifact is `dist/`; deploy it as a Standard static app. Do not use
-any server/runtime or paid deployment feature.
-
-## Verification recorded 2026-08-27
-
-- Clean `npm ci`: passed; 72 packages audited, 0 vulnerabilities.
-- `npm test`: passed, 7/7 tests.
-- `npm run build`: passed. Initial JS is 19.20 kB raw / 7.29 kB gzip; CSS is
-  20.02 kB raw / 5.44 kB gzip, within the static budgets.
-- Browser quality gate against the production-static preview: passed at 390×844.
-  All three steady targets and faults worked; water fault/watch pause worked;
-  no mobile horizontal overflow; skip-link focus reached `main`; axe had 0
-  violations (0 serious/critical); browser console had 0 errors.
-- Offline: after service-worker control, offline reload rendered **Clean water
-  works**, and the content-hashed module returned HTTP 200 JavaScript rather than
-  an HTML fallback.
-- Headers: preview returned `no-cache, must-revalidate` for the HTML shell,
-  `public, max-age=31536000, immutable` for the hashed JS module, and
-  `no-cache, no-store, must-revalidate` for `sw.js`.
-- `verify-url.sh` desktop/mobile smoke test: HTTP 200, title/lang/main/one h1/alt
-  checks passed with 0 console errors.
-- Service-worker update contract: versioned cache v3, `skipWaiting`,
-  `clients.claim`, and old-cache cleanup are present; the updated worker was
-  exercised by the offline browser gate.
-- Lighthouse CLI was available but this container's Chromium could not accept a
-  Lighthouse debugging connection. The prior independent live baseline was
-  100/100/100/100 (performance/accessibility/best-practices/SEO; LCP 1.3 s,
-  CLS 0, TBT 0 ms). The non-Lighthouse mobile/axe/browser checks above were rerun
-  after this repair.
-- Standard static deployment: uploaded successfully to
-  `https://how-it-runs.sociobot.in`. Post-deploy browser quality gate and
-  `verify-url.sh` both passed against the live URL with the same 390 px, axe,
-  offline-module, focus, update-contract, cache-header, and zero-console-error
-  results. Live headers matched the expected shell, hashed-asset, and `sw.js`
-  policies above.
-
-## Privacy and known limits
-
-No analytics, tracking, third-party requests, accounts, cookies, or remote fonts
-were added. State remains in the share URL. Repeat visits work offline after the
-service worker has installed; a first-ever visit still requires a network
-connection. The simulations are intentionally simplified intuition-builders, not
-operational tools.
+No product code was changed by this verification. The product remains a static
+deployment; it has no backend, accounts, payments, or external runtime services.
