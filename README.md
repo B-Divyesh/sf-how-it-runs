@@ -43,9 +43,11 @@ npm run verify:browser -- http://127.0.0.1:4173
 
 `npm run build` is the production build command. It performs strict TypeScript
 checking and writes the static deployment to `dist/`, with `dist/index.html` at its
-root. `verify:browser` expects the preview server to be running and exercises all
-three targets plus the water fault, watch-mode pause, keyboard skip link, mobile
-overflow, axe accessibility rules, and browser console.
+root. `npm run preview` serves that exact directory using the same Static Web Apps
+navigation and cache rules committed for deployment. `verify:browser` expects that
+preview server to be running and exercises all three targets plus the water fault,
+watch-mode pause, keyboard skip-link focus, mobile overflow, axe accessibility,
+offline reload/module MIME behavior, cache headers, and browser console.
 
 ## Product behavior
 

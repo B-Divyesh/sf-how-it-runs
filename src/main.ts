@@ -23,9 +23,17 @@ const routeList = requireElement<HTMLDivElement>('#route-list');
 const simulator = requireElement<HTMLElement>('#simulator');
 const toast = requireElement<HTMLDivElement>('#toast');
 const offlineBanner = requireElement<HTMLDivElement>('#offline-banner');
+const main = requireElement<HTMLElement>('#main');
 
 let watchTimer: number | undefined;
 let toastTimer: number | undefined;
+
+// A fragment alone does not consistently move keyboard focus. Keep the target
+// programmatically focusable and explicitly land there after the browser updates
+// the hash, without adding it to the normal tab order.
+document.querySelector<HTMLAnchorElement>('.skip-link')?.addEventListener('click', () => {
+  window.requestAnimationFrame(() => main.focus({ preventScroll: true }));
+});
 
 const params = new URLSearchParams(window.location.search);
 const requestedSystem = params.get('system');

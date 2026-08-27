@@ -9,10 +9,25 @@ const errors = [];
 page.on('pageerror', (error) => errors.push(String(error)));
 page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
 
-await page.goto(base, { waitUntil: 'networkidle' });
+const homeResponse = await page.goto(base, { waitUntil: 'networkidle' });
+if (!homeResponse?.headers()['cache-control']?.includes('no-cache')) throw new Error('HTML shell must revalidate instead of being immutable.');
 if (await page.locator('h1').count() !== 1) throw new Error('Expected exactly one h1.');
 await page.keyboard.press('Tab');
 if (await page.locator(':focus').innerText() !== 'Skip to the simulator') throw new Error('Skip link is not the first keyboard stop.');
+await page.keyboard.press('Enter');
+await page.waitForFunction(() => document.activeElement?.id === 'main');
+if (!page.url().endsWith('#main')) throw new Error('Skip link did not preserve its main-content fragment.');
+
+const moduleUrl = await page.locator('script[type="module"]').getAttribute('src');
+if (!moduleUrl?.startsWith('/assets/')) throw new Error('Production build did not emit a content-hashed module asset.');
+const assetHeaders = await page.evaluate(async (url) => Object.fromEntries((await fetch(url)).headers.entries()), moduleUrl);
+if (!assetHeaders['cache-control']?.includes('immutable')) throw new Error('Content-hashed assets must be served with immutable caching.');
+const workerHeaders = await page.evaluate(async () => Object.fromEntries((await fetch('/sw.js', { cache: 'no-store' })).headers.entries()));
+if (!workerHeaders['cache-control']?.includes('no-store')) throw new Error('Service worker script must revalidate instead of being immutable.');
+const workerSource = await page.evaluate(async () => (await fetch('/sw.js', { cache: 'no-store' })).text());
+if (!workerSource.includes('skipWaiting') || !workerSource.includes('clients.claim') || !workerSource.includes('caches.delete')) {
+  throw new Error('Service worker update lifecycle contract is incomplete.');
+}
 
 for (const [system, settings] of [
   ['water', '65,65,60'],
@@ -57,6 +72,17 @@ if (!await page.evaluate(() => Boolean(navigator.serviceWorker.controller))) {
 await context.setOffline(true);
 await page.reload({ waitUntil: 'domcontentloaded' });
 await page.getByRole('heading', { name: 'Clean water works' }).first().waitFor();
+const offlineModule = await page.evaluate(async (url) => {
+  const response = await fetch(url);
+  return {
+    contentType: response.headers.get('content-type'),
+    status: response.status,
+    startsAsHtml: (await response.text()).trimStart().startsWith('<'),
+  };
+}, moduleUrl);
+if (offlineModule.status !== 200 || !offlineModule.contentType?.includes('javascript') || offlineModule.startsAsHtml) {
+  throw new Error(`Offline module response was not JavaScript: ${JSON.stringify(offlineModule)}`);
+}
 await context.setOffline(false);
 
 console.log(JSON.stringify({
@@ -66,6 +92,11 @@ console.log(JSON.stringify({
   watchModePaused: true,
   mobileOverflow: false,
   offlineReload: true,
+  offlineModuleJavaScript: true,
+  skipLinkFocus: true,
+  immutableAssetCaching: true,
+  shellAndWorkerRevalidate: true,
+  serviceWorkerUpdateContract: true,
   axeViolations: axe.violations.length,
   seriousOrCritical: serious.length,
   consoleErrors: errors.length,
