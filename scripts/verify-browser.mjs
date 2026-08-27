@@ -9,6 +9,25 @@ const errors = [];
 page.on('pageerror', (error) => errors.push(String(error)));
 page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
 
+async function assertMobileTouchTargets() {
+  const undersized = await page.locator('a, button, input, summary').evaluateAll((controls) => controls
+    .filter((control) => {
+      const style = getComputedStyle(control);
+      const rect = control.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+    })
+    .map((control) => {
+      const rect = control.getBoundingClientRect();
+      return {
+        label: control.getAttribute('aria-label') || control.textContent?.trim() || control.id || control.tagName,
+        width: Math.round(rect.width * 100) / 100,
+        height: Math.round(rect.height * 100) / 100,
+      };
+    })
+    .filter(({ width, height }) => width < 44 || height < 44));
+  if (undersized.length) throw new Error(`Visible mobile controls must be at least 44 × 44 CSS px: ${JSON.stringify(undersized)}`);
+}
+
 const homeResponse = await page.goto(base, { waitUntil: 'networkidle' });
 if (!homeResponse?.headers()['cache-control']?.includes('no-cache')) throw new Error('HTML shell must revalidate instead of being immutable.');
 if (await page.locator('h1').count() !== 1) throw new Error('Expected exactly one h1.');
@@ -17,6 +36,7 @@ if (await page.locator(':focus').innerText() !== 'Skip to the simulator') throw 
 await page.keyboard.press('Enter');
 await page.waitForFunction(() => document.activeElement?.id === 'main');
 if (!page.url().endsWith('#main')) throw new Error('Skip link did not preserve its main-content fragment.');
+await assertMobileTouchTargets();
 
 const moduleUrl = await page.locator('script[type="module"]').getAttribute('src');
 if (!moduleUrl?.startsWith('/assets/')) throw new Error('Production build did not emit a content-hashed module asset.');
@@ -52,6 +72,7 @@ if (!page.url().includes('fault=1')) throw new Error('Fault state was not writte
 await page.getByRole('button', { name: /Watch it run/ }).click();
 await page.getByRole('button', { name: /Pause watch mode/ }).waitFor();
 await page.getByRole('button', { name: /Pause watch mode/ }).click();
+await assertMobileTouchTargets();
 
 await page.goto(`${base}/?system=water&set=65,65,60`, { waitUntil: 'networkidle' });
 const watchControl = page.getByRole('button', { name: 'Watch it run' });
@@ -121,6 +142,7 @@ console.log(JSON.stringify({
   immutableAssetCaching: true,
   shellAndWorkerRevalidate: true,
   serviceWorkerUpdateContract: true,
+  mobileTouchTargets: true,
   axeViolations: axe.violations.length,
   seriousOrCritical: serious.length,
   consoleErrors: errors.length,

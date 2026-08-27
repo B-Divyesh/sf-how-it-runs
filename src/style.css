@@ -33,10 +33,11 @@ button { color: inherit; }
 .skip-link:focus { top: 16px; }
 
 .site-header { min-height: 72px; padding: 10px clamp(20px, 5vw, 72px); background: var(--deep-night); color: var(--paper); display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid #34515d; }
-.brand { display: inline-flex; gap: 12px; align-items: center; text-decoration: none; font-family: var(--display); font-weight: 900; text-transform: uppercase; letter-spacing: .12em; }
+.brand { display: inline-flex; min-width: 44px; min-height: 44px; gap: 12px; align-items: center; text-decoration: none; font-family: var(--display); font-weight: 900; text-transform: uppercase; letter-spacing: .12em; }
 .brand-mark { width: 42px; height: 42px; display: grid; place-items: center; border: 2px solid var(--marigold); color: var(--marigold); font-size: 12px; letter-spacing: .05em; transform: rotate(45deg); }
 .brand-mark::first-line { transform: rotate(-45deg); }
 .site-header nav { display: flex; gap: 28px; font-size: 14px; font-weight: 700; }
+.site-header nav a { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; }
 
 .hero { min-height: 650px; background: var(--night); color: var(--paper); display: grid; grid-template-columns: minmax(350px, .78fr) 1.22fr; position: relative; overflow: hidden; border-bottom: 10px solid var(--marigold); }
 .hero-copy { position: relative; z-index: 2; align-self: center; padding: 80px 24px 94px clamp(24px, 6vw, 96px); }
@@ -190,7 +191,8 @@ summary { cursor: pointer; font-weight: 900; min-height: 44px; display: flex; al
 .toast { position: fixed; z-index: 31; right: 22px; bottom: 22px; max-width: min(370px, calc(100% - 44px)); background: var(--paper); color: var(--ink); padding: 16px 20px; border: 2px solid var(--ink); box-shadow: 5px 5px 0 var(--marigold); font-weight: 800; }
 footer { padding: 28px clamp(20px, 6vw, 96px) calc(28px + env(safe-area-inset-bottom)); background: var(--deep-night); color: #c9d4d6; display: flex; justify-content: space-between; gap: 24px; font-size: 13px; }
 footer p { margin: 0; }
-footer a { color: var(--paper); margin-right: 16px; }
+footer .footer-links { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+footer a { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; color: var(--paper); }
 
 @keyframes route { to { background-position: 20px 0; } }
 @keyframes live { 50% { opacity: .35; } }
@@ -265,6 +267,7 @@ footer a { color: var(--paper); margin-right: 16px; }
   .grownups { padding: 78px 18px; grid-template-columns: 1fr; gap: 20px; }
   .grownups-copy { font-size: 17px; }
   footer { flex-direction: column; padding-inline: 18px; }
+  footer .footer-links { align-items: flex-start; }
   footer span { display: block; margin-top: 10px; }
 }
 
