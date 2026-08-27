@@ -60,6 +60,17 @@ for (const [system, settings] of [
   if (await fault.isDisabled()) throw new Error(`${system} fault did not unlock at its documented target.`);
 }
 
+await page.goto(`${base}/?system=water&set=66.6,65,60`, { waitUntil: 'networkidle' });
+const importedSettling = page.locator('#lever-settling');
+const importedSettlingOutput = page.locator('#value-settling');
+if (await importedSettling.inputValue() !== '65' || await importedSettlingOutput.innerText() !== '65%') {
+  throw new Error('Fractional URL input was not normalized to the settling lever’s 5% step.');
+}
+const normalizedUrl = new URL(page.url());
+if (normalizedUrl.searchParams.get('set') !== '65,65,60') {
+  throw new Error(`Fractional URL input was not rewritten to its canonical stepped state: ${page.url()}`);
+}
+
 await page.goto(base, { waitUntil: 'networkidle' });
 await page.getByRole('button', { name: /Run this system/ }).first().click();
 await page.locator('#lever-settling').fill('65');
@@ -135,6 +146,7 @@ console.log(JSON.stringify({
   watchModePaused: true,
   enterThenSpaceWatchControl: true,
   unknownRouteUrlNormalized: true,
+  fractionalUrlStateNormalized: true,
   mobileOverflow: false,
   offlineReload: true,
   offlineModuleJavaScript: true,

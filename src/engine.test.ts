@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { systems } from './data';
+import { normalizeLeverValue, systems } from './data';
 import { evaluateSystem } from './engine';
 
 describe('shared simulation engine', () => {
@@ -50,5 +50,16 @@ describe('system definitions', () => {
       expect(system.watchSteps.length).toBeGreaterThanOrEqual(4);
       expect(system.facts.length).toBeGreaterThanOrEqual(3);
     }
+  });
+
+  it('normalizes imported URL values to each lever’s valid range step', () => {
+    const settling = systems[0].levers[0];
+    const battery = systems[1].levers[1];
+
+    // Regression: a shared 66.6% settling value must agree with its 5% range input.
+    expect(normalizeLeverValue(settling, 66.6)).toBe(65);
+    expect(normalizeLeverValue(settling, -999)).toBe(20);
+    expect(normalizeLeverValue(settling, 999)).toBe(100);
+    expect(normalizeLeverValue(battery, 2.6)).toBe(5);
   });
 });

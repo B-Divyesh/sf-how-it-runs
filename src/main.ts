@@ -1,5 +1,5 @@
 import './style.css';
-import { systems, systemMap, isSystemId } from './data';
+import { systems, systemMap, isSystemId, normalizeLeverValue } from './data';
 import { evaluateSystem } from './engine';
 import type { SystemDefinition, SystemId } from './types';
 
@@ -83,7 +83,7 @@ function valuesFromUrl(definition: SystemDefinition | null): number[] {
   }
   return raw.map((value, index) => {
     const lever = definition.levers[index];
-    return Math.max(lever.min, Math.min(lever.max, value));
+    return normalizeLeverValue(lever, value);
   });
 }
 

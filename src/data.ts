@@ -1,4 +1,4 @@
-import type { SystemDefinition, SystemId } from './types';
+import type { Lever, SystemDefinition, SystemId } from './types';
 
 export const systems: SystemDefinition[] = [
   {
@@ -103,4 +103,13 @@ export const systemMap = new Map<SystemId, SystemDefinition>(systems.map((system
 
 export function isSystemId(value: string | null): value is SystemId {
   return value === 'water' || value === 'grid' || value === 'bakery';
+}
+
+// URL parameters can bypass a native range input, so bring every imported value
+// back onto the same discrete scale the person can operate in the interface.
+export function normalizeLeverValue(lever: Lever, value: number): number {
+  const bounded = Math.max(lever.min, Math.min(lever.max, value));
+  const snapped = lever.min + Math.round((bounded - lever.min) / lever.step) * lever.step;
+  const decimalPlaces = (lever.step.toString().split('.')[1] || '').length;
+  return Math.max(lever.min, Math.min(lever.max, Number(snapped.toFixed(decimalPlaces))));
 }
