@@ -6,7 +6,7 @@
 **Deployment class:** Azure Static Web App (`dist/`)
 **Completed:** 2026-08-27 UTC
 
-## Release result: PASS locally; deployment verification follows publish
+## Release result: PASS and deployed
 
 The sole release-blocking finding in verification 3 was repaired: visible header
 and footer links at a 390 × 844 viewport did not provide 44 × 44 CSS px touch
@@ -59,9 +59,32 @@ timeout 120s npm run verify:browser -- http://127.0.0.1:4173
 
 ## Publish and live re-check
 
-The built `dist/` artifact is published with `/opt/fleet/lib/deploy-static.sh
-how-it-runs dist`. After the publish, the local and live browser gates and live
-identity/header checks are recorded here before handoff.
+Commit `11e7fbb` was pushed to `main`. The verified `dist/` artifact was published
+with `/opt/fleet/lib/deploy-static.sh how-it-runs dist` (Azure deployment
+`49102656-1210-4413-b5a6-542b6baf10ce`) and is live at
+<https://how-it-runs.sociobot.in>.
+
+- `timeout 120s npm run verify:browser -- https://how-it-runs.sociobot.in` passed:
+  all three target journeys, water fault, keyboard skip and Watch **Enter → Space**,
+  mobile overflow, 44 px target regression, axe (0 violations), no console errors,
+  immutable assets, worker update lifecycle, and offline shell/module reload.
+- The live 390 px measurements are the same as local: brand **178.67 × 44**,
+  **Pick a system 92.63 × 44**, **Privacy 44 × 44**, and **Terms 44 × 44** CSS px.
+  A live 1440 × 1000 steady-grid smoke test had no horizontal overflow or console
+  errors.
+- `/opt/fleet/lib/verify-url.sh` passed against the live URL: HTTP 200 in 665 ms,
+  title/lang/one `h1`/`main`/image alt checks pass, and there were no page or
+  console errors. The live headers include HSTS, self-only CSP, nosniff,
+  strict-origin referrer policy, disabled camera/mic/geolocation, revalidating
+  shell, immutable assets, and no-store service worker.
+- SHA-256 identity checks matched live `/`, both hashed JS/CSS assets, `sw.js`,
+  legal CSS, Privacy, Terms, favicon, all four hero variants, robots, and sitemap
+  byte-for-byte against the deployed local build.
+- Lighthouse mobile scores were **100 Performance / 100 Accessibility / 100 Best
+  Practices / 100 SEO** (FCP 1.0 s, LCP 1.1 s, TBT 30 ms, CLS 0). Lighthouse wrote
+  the report but ended with Chromium's known final screenshot/BFCache tab-crash
+  message, so treat the score as advisory; the independently complete Playwright
+  live gate passed.
 
 ## Known gaps / next steps
 
