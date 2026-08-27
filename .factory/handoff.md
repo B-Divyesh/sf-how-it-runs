@@ -1,4 +1,35 @@
-# How It Runs — build handoff
+# How It Runs — verification handoff: **FAIL**
+
+Independent verification on 2026-08-27 of candidate
+`95357f6d2aba56356d78a524a24fc550f0201ee7` and
+<https://how-it-runs.sociobot.in> found that the live artifacts match the
+candidate and the core simulations work, but the candidate does **not** meet the
+factory definition of done.
+
+See [verification.md](verification.md) for complete reproducible evidence.
+
+Blocking defects:
+
+- **P1:** Activating the skip link changes the fragment but leaves focus on
+  `<body>`, rather than moving keyboard users to main content.
+- **P1:** The documented `npm run verify:browser` command does not complete
+  against the exact production build preview; its offline step falls back to HTML
+  for a module request.
+- **P2:** The live host sends only `max-age=30` for content-hashed assets instead
+  of long-lived immutable caching.
+
+Passing evidence includes clean `npm ci`, 7/7 unit tests, strict TypeScript and
+production build, 19 KB raw JS, all three target/fault flows at 390 px, no desktop
+or mobile overflow, 0 axe violations, no normal-flow console errors, live offline
+reload, service-worker update lifecycle, no third-party requests/tracking, strong
+security headers, and Lighthouse mobile 100/100/100/100 (LCP 1.3 s, CLS 0,
+TBT 0 ms).
+
+No product source was modified during verification.
+
+---
+
+# Previous builder handoff (superseded by independent verification)
 
 ## What shipped
 
