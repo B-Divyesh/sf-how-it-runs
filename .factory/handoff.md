@@ -1,54 +1,36 @@
-# How It Runs — repair handoff
+# How It Runs — verification handoff
 
-**Work order:** `how-it-runs-repair-2`
-**Repaired from:** verifier-2 candidate `ac0d806bc60db7b8494fe9661937793101c9c711`
-**Baseline report:** `.factory/verification-2.md`
-**Deployment class:** Standard static (`dist/`)
-**Completed:** 2026-08-27 UTC
+**Work order:** `how-it-runs-verify-3`
+**Verified candidate:** `b6f9f987f6c34d969873510099c7316c86c1c00e`
+**Live URL:** <https://how-it-runs.sociobot.in>
+**Deployment class:** static web (`dist/`)
+**Verified:** 2026-08-27 UTC
 
-## What changed
+## Release result: FAIL
 
-- Re-rendering the simulator now restores keyboard focus to the corresponding
-  replacement control. This covers the Watch/Pause control, flow control, fault,
-  reset, and range controls. A keyboard user can press **Enter** on **Watch it
-  run**, then immediately press **Space** on the focused **Pause watch mode**
-  control; pausing likewise leaves focus on the replacement Watch control.
-- Recovery to the departure state now rewrites the URL with `history.replaceState`.
-  An unknown `system` query no longer leaves an invalid share link in the address
-  bar; closing a running route also correctly clears its route state.
-- Extended the production browser gate with exact Enter-then-Space focus and
-  unknown-route URL-normalization regressions.
+The live runtime artifact is byte-identical to the candidate and the build, tests,
+browser/PWA gate, all three simulator journeys, privacy, security headers, caching,
+desktop/mobile overflow, keyboard behavior, and axe checks pass. The release is not
+accepted because visible mobile links violate the attached non-negotiable 44 × 44 px
+touch-target baseline.
 
-## Verification
+At 390 × 844, measured dimensions are: brand 179 × 38 px, **Pick a system** 93 ×
+22 px, **Privacy** 43 × 15 px, and **Terms** 35 × 15 px. This P2 defect matters for
+the touch-friendly child-facing experience. See `.factory/verification-3.md` for
+the complete reproducible evidence and remediation.
 
-Ran from a clean dependency install (`npm ci`):
+## How to verify
 
 ```sh
+npm ci
 npm test
 npm run build
 npm run preview -- --port 4173
 npm run verify:browser -- http://127.0.0.1:4173
+npm run verify:browser -- https://how-it-runs.sociobot.in
 ```
 
-- Unit/integration: 7/7 Vitest tests passed.
-- Type check and Vite production build passed; `dist/` was written. Initial
-  JavaScript is 19.81 KB raw / 7.48 KB gzip and CSS is 20.02 KB raw / 5.44 KB
-  gzip, inside the static budgets.
-- Production browser gate passed at 390 × 844: targets/fault, mobile overflow,
-  visible skip-link focus, exact Watch **Enter → Space** behavior, normalized
-  invalid route URL, axe (0 violations), no console errors, immutable hashed
-  assets, and PWA offline reload with a JavaScript module response.
-- Desktop smoke test passed at 1440 × 1000 on a steady grid route with no
-  horizontal overflow or page errors.
-
-## Deploy and re-check
-
-Published the freshly built `dist/` directory as **Standard static** to
-<https://how-it-runs.sociobot.in>; the endpoint returned HTTP 200. The live
-production browser/PWA gate passed with the same results as local, including the
-exact Watch **Enter → Space** test and normalized unknown-route URL. A live 1440 ×
-1000 desktop smoke test also reached the grid target without overflow or page
-errors.
-
-The application remains local-first: it has no accounts, analytics, cookies,
-third-party runtime requests, or backend. No known release-blocking gaps remain.
+The first four commands and both browser gates passed during this verification.
+After the touch-target repair, rerun the mobile `getBoundingClientRect()` audit for
+all visible `a`, `button`, `input`, and `summary` controls, then repeat the commands
+above. No product code was changed by this verifier.
