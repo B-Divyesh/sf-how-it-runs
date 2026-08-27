@@ -43,11 +43,12 @@ npm run verify:browser -- http://127.0.0.1:4173
 
 ## Deploy and re-check
 
-Deploy the freshly built `dist/` directory as **Standard static**. Then run:
-
-```sh
-npm run verify:browser -- https://how-it-runs.sociobot.in
-```
+Published the freshly built `dist/` directory as **Standard static** to
+<https://how-it-runs.sociobot.in>; the endpoint returned HTTP 200. The live
+production browser/PWA gate passed with the same results as local, including the
+exact Watch **Enter → Space** test and normalized unknown-route URL. A live 1440 ×
+1000 desktop smoke test also reached the grid target without overflow or page
+errors.
 
 The application remains local-first: it has no accounts, analytics, cookies,
 third-party runtime requests, or backend. No known release-blocking gaps remain.
