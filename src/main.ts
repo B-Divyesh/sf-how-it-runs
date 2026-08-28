@@ -127,7 +127,7 @@ function setDocumentRoute(announce = false): void {
     canonical = 'https://how-it-runs.sociobot.in/demo/';
   } else if (definition) {
     pageTitle.textContent = `${definition.title} simulator`;
-    title = `${definition.title} simulator — How It Runs`;
+    title = `How It Runs — ${definition.title} simulator`;
     description = `Adjust three controls and read three results in the ${definition.title.toLowerCase()} simulation.`;
     canonical = `https://how-it-runs.sociobot.in/systems/${definition.id}/`;
   } else {

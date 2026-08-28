@@ -244,9 +244,9 @@ try {
     const page = await context.newPage();
     const routes = [
       ['/demo/', 'Demo — How It Runs', 'https://how-it-runs.sociobot.in/demo/'],
-      ['/systems/water/', 'Clean water works simulator — How It Runs', 'https://how-it-runs.sociobot.in/systems/water/'],
-      ['/systems/grid/', 'Neighborhood power grid simulator — How It Runs', 'https://how-it-runs.sociobot.in/systems/grid/'],
-      ['/systems/bakery/', 'Morning bakery line simulator — How It Runs', 'https://how-it-runs.sociobot.in/systems/bakery/'],
+      ['/systems/water/', 'How It Runs — Clean water works simulator', 'https://how-it-runs.sociobot.in/systems/water/'],
+      ['/systems/grid/', 'How It Runs — Neighborhood power grid simulator', 'https://how-it-runs.sociobot.in/systems/grid/'],
+      ['/systems/bakery/', 'How It Runs — Morning bakery line simulator', 'https://how-it-runs.sociobot.in/systems/bakery/'],
       ['/privacy/', 'Privacy — How It Runs', 'https://how-it-runs.sociobot.in/privacy/'],
       ['/terms/', 'Terms — How It Runs', 'https://how-it-runs.sociobot.in/terms/'],
     ];
@@ -256,7 +256,16 @@ try {
         if (!html.includes(needle)) throw new Error(`${path} raw HTML lacks ${needle}.`);
       }
       await page.goto(`${base}${path}`, { waitUntil: 'networkidle' });
-      if (await page.title() !== title || await page.locator('link[rel="canonical"]').getAttribute('href') !== canonical) throw new Error(`${path} executed metadata is wrong.`);
+      const executed = await page.evaluate(() => ({
+        title: document.title,
+        canonical: document.querySelector('link[rel="canonical"]')?.getAttribute('href'),
+        openGraphTitle: document.querySelector('meta[property="og:title"]')?.getAttribute('content'),
+        twitterTitle: document.querySelector('meta[name="twitter:title"]')?.getAttribute('content'),
+      }));
+      if (executed.title !== title || executed.canonical !== canonical || executed.openGraphTitle !== title || executed.twitterTitle !== title) throw new Error(`${path} executed metadata is wrong: ${JSON.stringify(executed)}.`);
+      if (path.startsWith('/systems/') && !title.startsWith('How It Runs — ')) {
+        throw new Error(`${path} does not use the product-first system title pattern.`);
+      }
     }
     const missingResponse = await fetch(`${base}/missing-metadata-check`);
     const missingHtml = await missingResponse.text();

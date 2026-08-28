@@ -45,4 +45,6 @@ has 16 words. All sentences are at or below 22 words. The banned-word scan for
 | --- | ---: | --- |
 | Use Node.js 20.19+ (20.x) or 22.12+. | 7 | Pass; exact range is claim-tested. |
 
-The catalog sentence starts with “Run,” has ten words, and is 69 characters long.
+The catalog sentence, “Run water, power, and bakery systems with controls,
+results, and faults,” starts with a verb, has 11 words, and is 72 characters
+long. Its product facts are covered by `@claim:system-loop`.

@@ -1,1 +1,1 @@
-Run water, power, and bakery systems in hands-on browser simulations.
+Run water, power, and bakery systems with controls, results, and faults.
