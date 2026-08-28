@@ -1,84 +1,35 @@
-# Polish 4 handoff
+# Handoff — adversarial review 5
 
-## Delivered
+## What was done
 
-- Fixed `F-4-1`: water, grid, and bakery now use product-first document,
-  Open Graph, and Twitter titles in both generated HTML and client navigation.
-- Extended `@claim:real-routes` to require exact raw and executed social titles
-  and the `How It Runs — …` system-title prefix.
-- Rechecked every finding in reviews 1–4 and polish records 2–3. The first
-  screen, isolated one-click demo, claims, real routes, focus, 404, legal shell,
-  mobile layout, privacy, offline mode, and accessibility remain fixed.
-- Updated the visible build label to `polish-4` and the catalog description to
-  a 72-character, verb-first sentence.
-- Preserved the civic art-deco transit-poster design and original generated
-  panorama. No generic redesign or unnecessary AI feature was added.
+Completed the requested non-mutating adversarial review of the live site and
+wrote `.factory/review-5.md`. The review verdict is **PASS** with zero findings.
+No product code, runtime asset, infrastructure, or deployment setting changed.
 
-Runtime repair commit: `0e8d9f17f1ece8d7cffa8c25fdbf734ada065876`.
-Live URL: <https://how-it-runs.sociobot.in>.
+## How verified
 
-## Exact verification evidence
-
-- Fresh clone: `/tmp/how-it-runs-polish4.5aqWY1/repo` at `0e8d9f1`.
-- `npm ci`: pass, 0 vulnerabilities.
-- `npm test`: pass, 8/8 Vitest tests.
-- `npm run build`: pass; `dist/index.html` produced.
-- Every test command in `.factory/claims.json` ran separately: 15/15 pass.
-- `npm run test:node-versions`: clean install, test, and build pass on Node.js
-  20.19.0, 22.12.0, and 24.
-- `npm run verify:browser -- http://127.0.0.1:4173`: pass.
-- `npm run verify:browser -- https://how-it-runs.sociobot.in`: pass.
-- Both browser gates report 0 axe violations, 0 serious/critical findings,
-  0 console errors, working offline reload, valid 44 px mobile targets, first-
-  screen facts, route focus/history, cache policy, and the styled 404.
-- `/opt/fleet/lib/verify-url.sh` passes locally and live. Live evidence is in
-  `.factory/evidence/polish-4/live-url/verify.json`.
-- Cold live 390 × 844 audit: headline, audience, sample action/result, and facts
-  end by y=700. One click opens `/demo/`; the banner begins at y=0 and a seeded
-  65% control appears at y=613. Reset returns 65. Exit clears the demo key and
-  preserves a pre-seeded real key.
-- Cold live metadata audit: all three raw and executed `<title>`, `og:title`,
-  and `twitter:title` values exactly match the product-first strings. Back and
-  Forward restore the route, focus, and announcement.
-- Cold live privacy audit: only `https://how-it-runs.sociobot.in` was requested;
-  there were no cookies and no console errors.
-- Lighthouse 12.8.2 mobile: local 100 Performance / 100 Accessibility / 100
-  Best Practices / 100 SEO, LCP 1.3 s, CLS 0, TBT 0 ms; live 100/100/100/100,
-  LCP 1.2 s, CLS 0, TBT 40 ms.
-- Production budgets: JS 22,496 B raw / 8,292 B gzip; CSS 24,490 B raw /
-  6,311 B gzip; mobile hero 34,397 B AVIF / 58,514 B WebP.
-- Deployment identity: SHA-256 matched 21/21 public runtime artifacts in
-  `dist` against the custom domain.
-
-Evidence index:
-
-- `.factory/evidence/polish-4/test-summary.json`
-- `.factory/evidence/polish-4/live-cold-check.json`
-- `.factory/evidence/polish-4/lighthouse-summary.json`
-- `.factory/evidence/polish-4/live-home-390.png`
-- `.factory/evidence/polish-4/live-demo-390.png`
-- `.factory/evidence/polish-4/live-water-390.png`
-- `.factory/evidence/polish-4/live-url/screenshot-desktop.png`
-- `.factory/polish-4.md`
-
-## Run and verify
+From a fresh clone at `/tmp/how-it-runs-review-5`:
 
 ```sh
 npm ci
 npm test
 npm run build
-npm run preview -- --port 4173
-npm run verify:browser -- http://127.0.0.1:4173
-npm run test:claims
+# Run each command declared in .factory/claims.json
 npm run test:node-versions
+npm run verify:browser -- https://how-it-runs.sociobot.in
+mkdir -p /tmp/how-it-runs-review-5-url
+/opt/fleet/lib/verify-url.sh https://how-it-runs.sociobot.in /tmp/how-it-runs-review-5-url
 ```
 
-## Deployment
+`npm test` passed 8/8 and the build produced `dist/index.html`. All 15 claim
+commands passed, including the clean Node 20.19.0, 22.12.0, and 24 test/build
+matrix. The live browser gate reported zero Axe violations, zero serious or
+critical accessibility issues, zero console errors, valid 390 px touch targets,
+working demo isolation/offline reload/history/focus/404, and no dead internal
+links. A separate fresh mobile demo flow confirmed seed/reset/exit storage
+isolation and same-origin-only requests.
 
-Built with the work-order command `npm ci && npm test && npm run build`, then
-deployed `dist/` to the production Azure Static Web App `sf-how-it-runs`. The
-custom domain serves build `polish-4` and the exact tested artifacts.
+## Known gaps / next steps
 
-## Known gaps and next steps
-
-None. Every cumulative review finding and every acceptance gate is resolved.
+None found in this review. Keep the claim matrix and repeat the live smoke
+checks whenever copy, routes, storage, service worker, or metadata changes.
