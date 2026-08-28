@@ -4,7 +4,13 @@ Candidate repaired: `f4de14593cc1d319cb029f98e28f8d5db6dbde60`.
 
 Local visual evidence: `.factory/evidence/home-390.png`,
 `.factory/evidence/demo-390.png`, and `.factory/evidence/home-1440.png`.
-The final live check is recorded in the handoff after deployment.
+Live URL check: `npm run verify:browser -- https://how-it-runs.sociobot.in`
+passed after deployment, including every public route, the designed 404,
+metadata, focus/announcement history, mobile/touch, offline reload, privacy
+request behavior, cache policy, and axe scans (0 violations). A cold 390 px
+visit to `https://how-it-runs.sociobot.in/demo/` also showed the banner and
+the 65/65/60 controls in the first viewport. This live check is evidence for
+each mapped row below.
 
 ## Review 1
 
