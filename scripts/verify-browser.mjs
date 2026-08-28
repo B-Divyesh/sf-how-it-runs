@@ -38,6 +38,19 @@ await page.waitForFunction(() => document.activeElement?.id === 'main');
 if (!page.url().endsWith('#main')) throw new Error('Skip link did not preserve its main-content fragment.');
 await assertMobileTouchTargets();
 
+const desktopPage = await context.newPage();
+await desktopPage.setViewportSize({ width: 1440, height: 900 });
+await desktopPage.goto(base, { waitUntil: 'networkidle' });
+const factsBox = await desktopPage.locator('.hero-facts').boundingBox();
+if (!factsBox || factsBox.y + factsBox.height > 900) throw new Error(`Desktop product facts fall below the first screen: ${JSON.stringify(factsBox)}`);
+await desktopPage.close();
+
+const deepLinkPage = await context.newPage();
+await deepLinkPage.goto(`${base}/systems/water/`, { waitUntil: 'networkidle' });
+const deepLinkLever = await deepLinkPage.locator('#lever-settling').boundingBox();
+if (!deepLinkLever || deepLinkLever.y >= 844 || deepLinkLever.y + deepLinkLever.height <= 0) throw new Error(`System deep link did not show a control in the first mobile viewport: ${JSON.stringify(deepLinkLever)}`);
+await deepLinkPage.close();
+
 const moduleUrl = await page.locator('script[type="module"]').getAttribute('src');
 if (!moduleUrl?.startsWith('/assets/')) throw new Error('Production build did not emit a content-hashed module asset.');
 const assetHeaders = await page.evaluate(async (url) => Object.fromEntries((await fetch(url)).headers.entries()), moduleUrl);
@@ -120,6 +133,34 @@ if (serious.length) {
 }
 if (errors.length) throw new Error(`Browser errors: ${errors.join('; ')}`);
 
+let allRouteAxeViolations = 0;
+const crawledLinks = new Set();
+for (const path of ['/', '/demo/', '/systems/water/', '/systems/grid/', '/systems/bakery/', '/privacy/', '/terms/', '/missing-accessibility-check']) {
+  const routePage = await context.newPage();
+  const response = await routePage.goto(`${base}${path}`, { waitUntil: 'networkidle' });
+  if (path.startsWith('/missing-') ? response?.status() !== 404 : !response?.ok()) throw new Error(`${path} returned the wrong document status.`);
+  const semantics = await routePage.evaluate(() => ({
+    lang: document.documentElement.lang,
+    h1: document.querySelectorAll('h1').length,
+    main: document.querySelectorAll('main').length,
+    missingAlt: [...document.querySelectorAll('img')].filter((image) => !image.hasAttribute('alt')).length,
+  }));
+  if (semantics.lang !== 'en' || semantics.h1 !== 1 || semantics.main !== 1 || semantics.missingAlt) throw new Error(`${path} semantic shell failed: ${JSON.stringify(semantics)}`);
+  const routeAxe = await new AxeBuilder({ page: routePage }).analyze();
+  allRouteAxeViolations += routeAxe.violations.length;
+  const routeSerious = routeAxe.violations.filter((violation) => ['serious', 'critical'].includes(violation.impact || ''));
+  if (routeSerious.length) throw new Error(`${path} has serious/critical axe violations: ${JSON.stringify(routeSerious)}`);
+  for (const href of await routePage.locator('a[href]').evaluateAll((links) => links.map((link) => link.href))) {
+    const url = new URL(href);
+    if (url.origin === base) crawledLinks.add(`${url.pathname}${url.search}`);
+  }
+  await routePage.close();
+}
+for (const href of crawledLinks) {
+  const response = await fetch(`${base}${href}`);
+  if (response.status >= 400) throw new Error(`Internal link ${href} returned ${response.status}.`);
+}
+
 await page.evaluate(async () => { await navigator.serviceWorker.ready; });
 if (!await page.evaluate(() => Boolean(navigator.serviceWorker.controller))) {
   await page.reload({ waitUntil: 'networkidle' });
@@ -127,7 +168,7 @@ if (!await page.evaluate(() => Boolean(navigator.serviceWorker.controller))) {
 }
 await context.setOffline(true);
 await page.reload({ waitUntil: 'domcontentloaded' });
-await page.getByRole('heading', { name: 'Clean water works simulator' }).first().waitFor();
+await page.getByRole('heading', { name: 'Try the water system with sample data' }).waitFor();
 const offlineModule = await page.evaluate(async (url) => {
   const response = await fetch(url);
   return {
@@ -142,7 +183,7 @@ if (offlineModule.status !== 200 || !offlineModule.contentType?.includes('javasc
 await context.setOffline(false);
 
 console.log(JSON.stringify({
-  route: 'water',
+  route: 'demo-water',
   targetReached: true,
   faultUnlocked: true,
   watchModePaused: true,
@@ -158,7 +199,11 @@ console.log(JSON.stringify({
   shellAndWorkerRevalidate: true,
   serviceWorkerUpdateContract: true,
   mobileTouchTargets: true,
+  desktopFactsInFirstScreen: true,
+  systemControlInFirstMobileScreen: true,
   axeViolations: axe.violations.length,
+  allRouteAxeViolations,
+  internalLinksChecked: crawledLinks.size,
   seriousOrCritical: serious.length,
   consoleErrors: errors.length,
 }, null, 2));

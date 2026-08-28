@@ -1,5 +1,5 @@
-const CACHE = 'how-it-runs-v3';
-const CORE = ['/', '/privacy/', '/terms/', '/legal.css', '/favicon.svg', '/hero-768.webp'];
+const CACHE = 'how-it-runs-v4';
+const CORE = ['/', '/demo/', '/systems/water/', '/systems/grid/', '/systems/bakery/', '/privacy/', '/terms/', '/legal.css', '/favicon.svg', '/hero-768.webp'];
 
 function isStaticAsset(request) {
   const { pathname } = new URL(request.url);

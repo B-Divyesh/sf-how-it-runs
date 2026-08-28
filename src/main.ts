@@ -83,7 +83,7 @@ function isDemoLocation(location = window.location): boolean {
   return location.pathname === '/demo' || location.pathname === '/demo/' || new URLSearchParams(location.search).get('demo') === '1';
 }
 
-const params = new URLSearchParams(window.location.search);
+let params = new URLSearchParams(window.location.search);
 const requestedSystem = params.get('system') || window.location.pathname.split('/')[2] || null;
 const initialId = systemFromLocation();
 const initialDefinition = initialId ? systemMap.get(initialId)! : null;
@@ -114,27 +114,42 @@ let demoMode = isDemoLocation();
 
 function setDocumentRoute(announce = false): void {
   const definition = state.systemId ? systemMap.get(state.systemId)! : null;
-  const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-  const description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-  if (definition) {
+  const setMeta = (selector: string, value: string, attribute = 'content') => {
+    document.querySelector<HTMLElement>(selector)?.setAttribute(attribute, value);
+  };
+  let title: string;
+  let description: string;
+  let canonical: string;
+  if (demoMode) {
+    pageTitle.textContent = 'Try the water system with sample data';
+    title = 'Demo — How It Runs';
+    description = 'Try water with sample data at 65% settling, 65% filter speed, and 60% disinfectant.';
+    canonical = 'https://how-it-runs.sociobot.in/demo/';
+  } else if (definition) {
     pageTitle.textContent = `${definition.title} simulator`;
-    document.title = `${definition.title} simulator — How It Runs`;
-    if (canonical) canonical.href = `https://how-it-runs.sociobot.in/systems/${definition.id}/`;
-    if (description) description.content = `Run the ${definition.title.toLowerCase()} simulation with clear controls and live results.`;
-  } else if (demoMode) {
-    pageTitle.textContent = 'Run everyday systems in five minutes';
-    document.title = 'Demo — How It Runs';
-    if (canonical) canonical.href = 'https://how-it-runs.sociobot.in/demo/';
-    if (description) description.content = 'Try the seeded water simulation with sample settings.';
+    title = `${definition.title} simulator — How It Runs`;
+    description = `Adjust three controls and read three results in the ${definition.title.toLowerCase()} simulation.`;
+    canonical = `https://how-it-runs.sociobot.in/systems/${definition.id}/`;
   } else {
-    pageTitle.textContent = 'Run everyday systems in five minutes';
-    document.title = 'How It Runs — Everyday system simulators';
-    if (canonical) canonical.href = 'https://how-it-runs.sociobot.in/';
+    pageTitle.textContent = 'Run water, power, and bakery systems';
+    title = 'How It Runs — Everyday system simulators';
+    description = 'Run water, power, and bakery browser simulations with three controls and five stages.';
+    canonical = 'https://how-it-runs.sociobot.in/';
   }
+  document.title = title;
+  setMeta('link[rel="canonical"]', canonical, 'href');
+  setMeta('meta[name="description"]', description);
+  setMeta('meta[property="og:title"]', title);
+  setMeta('meta[property="og:description"]', description);
+  setMeta('meta[property="og:url"]', canonical);
+  setMeta('meta[name="twitter:title"]', title);
+  setMeta('meta[name="twitter:description"]', description);
+  document.body.classList.toggle('is-demo', demoMode);
+  document.body.classList.toggle('is-system', !demoMode && Boolean(definition));
   demoBanner.hidden = !demoMode;
   if (announce) {
-    routeAnnouncement.textContent = definition ? `${definition.title} simulator opened.` : demoMode ? 'Sample demo opened.' : 'How It Runs home opened.';
-    pageTitle.focus({ preventScroll: true });
+    routeAnnouncement.textContent = demoMode ? 'Sample demo opened.' : definition ? `${definition.title} simulator opened.` : 'How It Runs home opened.';
+    pageTitle.focus();
   }
 }
 
@@ -197,7 +212,7 @@ function renderSimulator(announce = false): void {
         <p>Choose water, power, or bakery to open a simulation.</p>
       </div>`;
     updateUrl();
-    setDocumentRoute();
+    setDocumentRoute(announce);
     return;
   }
 
@@ -210,7 +225,7 @@ function renderSimulator(announce = false): void {
   simulator.innerHTML = `
     <div class="sim-titlebar">
       <div>
-        <p class="eyebrow">Route ${definition.number} · ${definition.kicker}</p>
+        <p class="eyebrow">System ${definition.number} · ${definition.kicker}</p>
         <h2>${definition.title}</h2>
         <p>${definition.question}</p>
       </div>
@@ -242,7 +257,7 @@ function renderSimulator(announce = false): void {
               <p>${stage.detail}</p>
             </li>`).join('')}
         </ol>
-        <div class="flow-note"><span>SIMPLIFIED MODEL</span><p>Real systems use more stages, instruments, safety checks, and people than this five-minute view.</p></div>
+        <div class="flow-note"><span>SIMPLIFIED MODEL</span><p>Real systems use more stages, instruments, safety checks, and people than this short view.</p></div>
       </section>
 
       <aside class="results-panel" aria-label="Live system results">
@@ -278,7 +293,7 @@ function renderSimulator(announce = false): void {
 
       <aside class="target-panel" aria-labelledby="target-title">
         <p class="panel-label">Today’s mission</p>
-        <h3 id="target-title">Find the steady zone</h3>
+        <h3 id="target-title">Meet all three targets</h3>
         <p>${definition.target}</p>
         <div class="target-stamps" aria-label="Target checks">
           <span class="${outcome.throughput >= (state.systemId === 'bakery' ? 68 : state.systemId === 'grid' ? 70 : 65) ? 'met' : ''}">Enough output</span>
@@ -300,13 +315,12 @@ function renderSimulator(announce = false): void {
     <div class="job-board">
       <div class="job-badge" aria-hidden="true">WHO<br />RUNS<br />THIS?</div>
       <div><p class="panel-label">A job inside this system</p><h3>${definition.jobTitle}</h3><p>${definition.jobDescription}</p></div>
-      <details><summary>What the tiny model leaves out</summary><ul>${definition.facts.map((fact) => `<li>${fact}</li>`).join('')}</ul></details>
+      <details><summary>What this simulation leaves out</summary><ul>${definition.facts.map((fact) => `<li>${fact}</li>`).join('')}</ul></details>
     </div>`;
 
-  if (announce) pageTitle.focus({ preventScroll: true });
-  else restoreSimulatorFocus(focus);
+  if (!announce) restoreSimulatorFocus(focus);
   updateUrl();
-  setDocumentRoute();
+  setDocumentRoute(announce);
   storeDemoState();
 }
 
@@ -341,8 +355,6 @@ function selectSystem(id: SystemId): void {
   if (!demoMode) history.pushState(null, '', `/systems/${id}/`);
   renderRoutes();
   renderSimulator(true);
-  simulator.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
-  pageTitle.focus({ preventScroll: true });
 }
 
 function applyWatchStep(step: number): void {
@@ -435,7 +447,6 @@ simulator.addEventListener('click', (event) => {
       if (!demoMode) history.pushState(null, '', '/');
       renderRoutes();
       renderSimulator(true);
-      document.querySelector('#routes')?.scrollIntoView({ behavior: 'smooth' });
       break;
     }
   }
@@ -446,12 +457,17 @@ function updateOnlineState(): void {
 }
 
 demoBanner.addEventListener('click', (event) => {
-  const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-demo-action="reset"]');
+  const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-demo-action]');
   if (!button) return;
+  if (button.dataset.demoAction === 'leave') {
+    sessionStorage.removeItem('demo:how-it-runs:state');
+    window.location.assign('/');
+    return;
+  }
   seedDemo();
   renderRoutes();
   renderSimulator(true);
-  showToast('Sample water system reset.');
+  showToast('Sample data reset.');
 });
 
 function restoreFromLocation(announce = true): void {
@@ -473,9 +489,7 @@ function restoreFromLocation(announce = true): void {
 }
 
 window.addEventListener('popstate', () => {
-  const currentParams = new URLSearchParams(window.location.search);
-  params.forEach((_value, key) => params.delete(key));
-  currentParams.forEach((value, key) => params.set(key, value));
+  params = new URLSearchParams(window.location.search);
   restoreFromLocation(true);
 });
 
@@ -488,7 +502,7 @@ renderSimulator();
 setDocumentRoute();
 
 if (requestedSystem !== null && !initialId) {
-  showToast('That route does not exist, so we brought you back to departures.');
+  showToast('That system does not exist, so we returned you to the home page.');
 }
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {

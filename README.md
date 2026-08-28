@@ -1,23 +1,27 @@
 # How It Runs
 
-Run everyday systems in five minutes. This free browser simulator is for kids and grown-ups who want to see how water, power, and bread reach a neighborhood.
+Run water, power, and bakery systems. This free browser simulator is for kids and grown-ups curious about everyday infrastructure.
 
-Open the [sample demo](https://how-it-runs.sociobot.in/demo/). It starts a water simulation with sample settings. The banner says when sample data is active. Reset demo restores the sample. Start for real leaves the sample without keeping it.
+Open the [sample demo](https://how-it-runs.sociobot.in/demo/). One click opens water at 65% settling, 65% filter speed, and 60% disinfectant.
+
+The demo banner stays visible while sample data is active. **Reset demo** restores the sample data. **Leave demo and clear sample** removes it.
 
 ## What is included
 
-- Water, power, and bakery simulations have controls, five stages, live results, a fault, and a worker’s job note.
+- Each simulation has three controls, five stages, three live results, a fault, and a worker’s job note.
 - Controls work with arrow keys.
-- Reduced-motion users receive static flow lines and instant transitions.
-- Water, power, and bakery simulations have shareable routes.
+- If your device reduces motion, flow lines stay still and screen changes do not animate.
+- Each simulation has a link you can copy and reopen.
+- Watch mode can pause and stops after four captions.
 - Works offline after the first visit.
 - No account; settings stay in the URL.
+- There are no accounts, analytics, cookies, or saved profiles.
 
 These simulations are not engineering, food-safety, or operational guidance.
 
 ## Run locally
 
-Requires Node.js 20 or newer.
+Use Node.js 20 or newer.
 
 ```sh
 npm ci
@@ -34,11 +38,17 @@ npm run verify:browser -- http://127.0.0.1:4173
 npm run test:claims
 ```
 
-`npm run build` writes the deployable static site to `dist/`.
+The production build creates the static site in `dist`, with `index.html` at its root.
+
+## Privacy and demo storage
+
+Demo changes use only `demo:how-it-runs:state` in session storage. Real mode does not read or write that key.
+
+The generated panorama is original to this product, with its source prompt and generation record included.
 
 ## Deploy
 
-Deploy `dist/` as an Azure Static Web App. The checked-in configuration sets headers and a styled 404 response.
+Deploy `dist/` as an Azure Static Web App. The included hosting file adds security rules and a branded page for missing links.
 
 ## License
 

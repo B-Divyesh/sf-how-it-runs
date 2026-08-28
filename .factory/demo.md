@@ -1,7 +1,9 @@
 # Demo sandbox
 
-Open `/demo/` or `/?demo=1` for the one-click sample. It opens Clean water works at 65% settling, 65% filter speed, and 60% disinfectant dose.
+Open `/demo/` or `/?demo=1`. From the home page, **Try it with sample data** enters the same demo in one click.
 
-The persistent banner says “Demo — sample data, nothing is saved.” **Reset demo** restores the same water sample. **Start for real** leaves the demo and removes the sample route.
+The next screen shows the demo banner and water controls in the first mobile viewport. The sample data is 65% settling, 65% filter speed, and 60% disinfectant.
 
-Demo changes are stored only under the `demo:how-it-runs:state` session-storage key. Real mode stores no browser data; its shareable settings are in the URL. Demo code never reads or writes a real storage key.
+**Reset demo** restores those three values. **Leave demo and clear sample** removes the demo session key before returning home.
+
+Demo changes use only `demo:how-it-runs:state` in session storage. Demo mode never reads or writes a real-data key. Real mode stores settings in the URL and does not use browser storage.
