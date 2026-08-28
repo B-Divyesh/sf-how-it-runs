@@ -1,53 +1,39 @@
-# How It Runs — adversarial review handoff
+# Repair handoff — perfection loop round 1
 
-**Work order:** `how-it-runs-review-1`
-**Candidate reviewed:** `04fe6b527c42238689a4695a7012a6b11f28c26b`
-**Live URL:** <https://how-it-runs.sociobot.in>
-**Result:** **FAIL**
+## Delivered
 
-Completed the requested cold first-read review at 390 × 844 and 1440 × 900,
-the complete landing/README copy audit, demo and sandbox checks, clean-clone
-claim/test audit, offline and request-interception exercise, metadata/routing
-inspection, Back/focus test, link crawl, accessibility gate, and visual-identity
-comparison. The detailed evidence and rewrites are in `.factory/review-1.md`.
+Repair code commit: `814d2d311237bef0d029fb62bba0cfac03089b19`.
 
-No product code was changed.
+- Rewrote the first screen with the required plain job, audience, sample action, result, and three tested facts.
+- Added `/demo/` and `?demo=1`, seeded water settings, the persistent demo banner, Reset demo, Start for real, and the `demo:` session-storage namespace.
+- Added claim manifest and isolated Playwright claim checks for every retained public claim.
+- Added physical `/systems/water/`, `/systems/grid/`, `/systems/bakery/`, and `/demo/` documents; route titles, canonical metadata, focused route announcements, browser Back/Forward behavior, and a styled HTTP 404.
+- Completed metadata, social card, apple touch icon, sitemap, shared legal shell, footer links, mobile demo targets, and the three-step landing section.
+- Preserved the civic art-deco transit-poster identity. The social image is a 1200 × 630 crop of the retained product panorama.
 
-## Blocking findings
+## Exact verification evidence
 
-1. The first screen does not plainly say that the product is a simulator or
-   identify kids as its audience.
-2. There is no one-click sample-data demo, demo banner, reset/start-real
-   controls, isolated namespace, or `.factory/demo.md`.
-3. `.factory/claims.json` and all `@claim:` tests are absent despite many public
-   claims on the landing page and in README.
-4. Unknown routes return the home page with HTTP 200, and simulator navigation
-   replaces history so Back skips prior simulator states.
+Clean clone: `/tmp/how-it-runs-clean.5PgZ9Y` cloned from the repair commit.
 
-## Verification performed
+| Command | Result |
+| --- | --- |
+| `npm ci` | Passed; 71 packages installed, 0 vulnerabilities reported. |
+| `npm test` | Passed; Vitest 8/8. |
+| `npm run test:claims` | Passed all eight: `sample-demo-isolated`, `free`, `offline-reload`, `private-url-settings`, `system-loop`, `keyboard-controls`, `reduced-motion`, and `real-routes`. |
+| Every individual command in `.factory/claims.json` | Passed after the full manifest run. |
+| `npm run build` | Passed; writes `dist/index.html` and static route documents. |
+| `npm run verify:browser -- http://127.0.0.1:4190` | Passed: demo, routes, 404, Back/Forward, focus, mobile overflow and 44 px targets, offline reload, cache policy, privacy/network checks, zero console errors, and Axe 0 violations. |
+| `/opt/fleet/lib/verify-url.sh http://127.0.0.1:4173 /tmp/how-it-runs-url-evidence` | Passed: HTTP 200, title, `lang`, one h1, main, alt text, and zero captured errors. |
+| Preview HTTP checks | `/not-a-real-route-qa` returned 404; `/demo/` returned 200. |
 
-From a clean local clone at the candidate commit:
+The Playwright Axe integration is the accessibility scanner used by `verify:browser`; it reported zero serious or critical violations. The standalone Axe CLI could not start its own Chrome binary in this container, so it was not used as release evidence.
 
-```sh
-npm ci
-npm test
-npm run build
-timeout 150s npm run verify:browser -- https://how-it-runs.sociobot.in
-```
+Final build budgets: JS 22.33 kB raw / 8.28 kB gzip; CSS 22.58 kB raw / 5.92 kB gzip; 768 px WebP hero remains 58.5 kB. All are within the static-product budgets.
 
-Results: install passed with 0 reported vulnerabilities, Vitest passed 8/8,
-the Vite production build passed, and the production browser gate passed with
-0 axe violations and 0 console errors. `/opt/fleet/lib/verify-url.sh` also
-reported no baseline errors after a successful HTTP 200 load.
+## Deploy
 
-Independent live checks confirmed same-origin-only requests, no cookies or
-web-storage keys, a usable offline simulator, working query deep links, and no
-dead HTTP links among the crawled home/legal-page links. These checks are not
-claim-tagged and therefore do not clear the claims blocker.
+Push `main` to the configured repository. The static Azure work order deploys `dist/`; `public/staticwebapp.config.json` supplies production cache and 404 behavior.
 
-## Next step
+## Known gaps
 
-Address B1–B4 first, add and document the demo and claims contracts, then apply
-the copy and metadata fixes listed in the review. Re-run the same clean-clone
-commands plus every command added to `.factory/claims.json` before requesting
-another first-read review.
+None. The standalone Axe CLI’s unavailable Chrome binary is an environment limitation, covered by the passing Playwright Axe scan.
