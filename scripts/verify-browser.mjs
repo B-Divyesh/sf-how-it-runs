@@ -152,6 +152,9 @@ for (const path of ['/', '/demo/', '/systems/water/', '/systems/grid/', '/system
   if (routeSerious.length) throw new Error(`${path} has serious/critical axe violations: ${JSON.stringify(routeSerious)}`);
   for (const href of await routePage.locator('a[href]').evaluateAll((links) => links.map((link) => link.href))) {
     const url = new URL(href);
+    // A same-document skip/anchor link is valid even on the intentionally
+    // missing route that this verifier loads to check the designed 404.
+    if (url.hash && url.pathname === new URL(`${base}${path}`).pathname) continue;
     if (url.origin === base) crawledLinks.add(`${url.pathname}${url.search}`);
   }
   await routePage.close();

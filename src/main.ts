@@ -328,6 +328,10 @@ function updateUrl(): void {
   const next = new URL(window.location.href);
   const pathSystem = next.pathname.match(/^\/systems\//);
   if (!demoMode && state.systemId && !pathSystem) next.pathname = `/systems/${state.systemId}/`;
+  // A simulator URL is a complete, shareable state—not an accumulation of
+  // whatever query values happened to be on the page before it. In particular,
+  // this prevents a demo link from importing a real system or stale settings.
+  next.search = '';
   if (demoMode) {
     next.pathname = '/demo/';
     next.searchParams.set('demo', '1');
@@ -474,7 +478,7 @@ function restoreFromLocation(announce = true): void {
   demoMode = isDemoLocation();
   const id = systemFromLocation();
   const definition = id ? systemMap.get(id)! : null;
-  if (demoMode && !id) {
+  if (demoMode) {
     seedDemo();
   } else {
     state.systemId = id;
@@ -496,7 +500,7 @@ window.addEventListener('popstate', () => {
 window.addEventListener('online', updateOnlineState);
 window.addEventListener('offline', updateOnlineState);
 updateOnlineState();
-if (demoMode && !initialId) seedDemo();
+if (demoMode) seedDemo();
 renderRoutes();
 renderSimulator();
 setDocumentRoute();

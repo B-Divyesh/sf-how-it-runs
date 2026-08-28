@@ -65,6 +65,14 @@ try {
     if (storage.real !== 'keep' || !storage.demo) throw new Error(`Demo isolation failed: ${JSON.stringify(storage)}`);
     await page.goto(`${base}/?demo=1`, { waitUntil: 'networkidle' });
     if (!await banner.isVisible() || await lever.inputValue() !== '65') throw new Error('?demo=1 did not enter the same isolated sample.');
+    await page.goto(`${base}/demo/?system=grid&set=20,100,0&fault=1&unrelated=keep`, { waitUntil: 'networkidle' });
+    if (await lever.inputValue() !== '65' || await page.locator('#lever-filter').inputValue() !== '65' || await page.locator('#lever-chlorine').inputValue() !== '60') {
+      throw new Error('A demo URL was allowed to override the fixed water sample.');
+    }
+    const canonicalDemo = new URL(page.url());
+    if (canonicalDemo.pathname !== '/demo/' || canonicalDemo.search !== '?demo=1&system=water&set=65%2C65%2C60') {
+      throw new Error(`Demo URL was not canonicalized to the isolated sample: ${page.url()}`);
+    }
     await browser.close();
     pass('sample-demo-isolated');
   });
