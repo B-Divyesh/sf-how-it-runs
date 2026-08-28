@@ -1,59 +1,47 @@
-# Polish 2 handoff
+# Review 3 handoff
 
 ## Delivered
 
-- Repaired all cumulative review findings from `.factory/review-1.md` and
-  `.factory/review-2.md`; the mapping is in `.factory/polish-2.md`.
-- The one-click demo is a fixed, isolated water sample. It has a visible,
-  persistent banner, reset, leave-and-clear control, separate `demo:` session
-  namespace, and canonical handling that rejects imported system/settings
-  values.
-- Completed claims, real route documents/metadata, history focus and
-  announcements, 404/legal shell, mobile fold/touch behavior, copy audit, and
-  catalog description. The art-deco civic-systems visual identity is unchanged.
-- Commit containing the product repair: `8c6b23d170b8b6de73d0fc8a6c8c3ffea9b29d34`.
+- Wrote `.factory/review-3.md` for candidate `1fdb855` and the live production
+  site. Verdict: **FAIL**.
+- No product code was modified.
+- Recorded a cold 390 × 844 and 1440 × 900 first read, complete landing/README
+  copy inventories, all declared claim results, demo/privacy/offline evidence,
+  site-structure checks, missed leverage, and an item-by-item reconciliation of
+  both earlier reviews.
+
+## Findings
+
+- **F-3-1 / reopened R1-B3 (blocking):** README and `package.json` promise all
+  Node 20+ releases, but Vite requires Node 20.19+ or 22.12+. Node 20.0 fails the
+  build. The claim is also absent from `.factory/claims.json`.
+- **F-3-2 (major):** the `real-routes` manifest claim promises that every
+  simulation link can be copied and reopened, but its declared test never
+  performs that flow. The behavior itself passed a manual live check for all
+  three systems.
 
 ## Verification
 
-- Fresh clone: `/tmp/how-it-runs-clean.M1Emlo`, cloned at the repair commit.
-  `npm ci`, all 14 individually invoked `.factory/claims.json` commands,
-  `npm test` (8/8), and `npm run build` passed. `dist/index.html` exists.
-- Local exact production build: `npm run build` passed. Assets: JavaScript
-  22.50 kB raw / 8.32 kB gzip; CSS 24.49 kB raw / 6.30 kB gzip.
-- Local browser/PWA/accessibility suite:
-  `npm run verify:browser -- http://127.0.0.1:4173` passed. It reported zero
-  console errors, zero axe violations on every checked route, no mobile
-  overflow, 44 px touch targets, offline reload, cache policy, route focus,
-  and route announcement checks.
-- Local semantic smoke test:
-  `/opt/fleet/lib/verify-url.sh http://127.0.0.1:4173 /tmp/how-it-runs-url-verify-4173`
-  passed in 529 ms with one h1, `lang=en`, `main`, image alt text, labeled
-  buttons, and no errors.
-- Visual evidence: `.factory/evidence/home-390.png`,
-  `.factory/evidence/demo-390.png`, `.factory/evidence/home-1440.png`.
+- Clean clone: `/tmp/how-it-runs-review3.6Wz6sR/clean` at `1fdb855`.
+- All 14 exact `.factory/claims.json` commands exited zero when run separately.
+- `npm test`: 8/8 passed.
+- `npm run build`: passed; JS 22.50 kB raw / 8.32 kB gzip and CSS 24.49 kB raw /
+  6.30 kB gzip.
+- `npm run verify:browser -- https://how-it-runs.sociobot.in`: passed with zero
+  axe violations and zero console errors.
+- `/opt/fleet/lib/verify-url.sh https://how-it-runs.sociobot.in ...`: passed in
+  550 ms with no errors.
+- Independent live checks covered cold first screens, one-click demo placement,
+  reset/exit/isolation, same-origin requests, all-system share/reopen, route
+  status/crawl, and Back/Forward focus/announcement.
+- Node boundary reproduction:
+  `npx --yes node@20.0.0 ./node_modules/vite/bin/vite.js build` failed with
+  Vite’s documented minimum-version error and `crypto.hash is not a function`.
 
-## Deployment and live recheck
+## Next steps
 
-- Pushed `f61d8b0b1f786c4c09639b74e507c56d74451a08` to `origin/main`.
-- Deployed `dist/` directly through the work-order Azure Static Web App
-  `sf-how-it-runs` production environment. The live host now serves
-  `/assets/index-kqmcoDY4.js` and the new browser-simulations metadata.
-- Cold live verification passed:
-  `npm run verify:browser -- https://how-it-runs.sociobot.in` reported zero
-  axe violations, zero console errors, designed 404, route metadata/focus,
-  responsive/touch checks, PWA offline reload, and cache policy checks.
-  `/opt/fleet/lib/verify-url.sh https://how-it-runs.sociobot.in
-  /tmp/how-it-runs-live-verify` passed in 1159 ms.
-- A separate fresh 390 × 844 live demo click showed the banner, water values
-  65/65/60, and a settling control in the first viewport.
-- Mobile Lighthouse against the live site scored **100 Performance / 100
-  Accessibility / 100 Best Practices / 100 SEO**. FCP was 997 ms, LCP 1,085
-  ms, TBT 35 ms, and CLS 0. The JSON is
-  `/tmp/how-it-runs-lighthouse.json`. Chromium emitted a final screenshot/
-  BFCache teardown error after the complete report was written; the scores and
-  metrics above are present in that report and agree with the completed
-  Playwright checks.
-
-## Known gaps
-
-None.
+1. Align README and `package.json#engines.node` with the actual Vite-supported
+   range and add a minimum-version claim test.
+2. Extend `@claim:real-routes` to copy and reopen changed settings for water,
+   grid, and bakery in fresh pages.
+3. Re-run the complete claim matrix and adversarial live review.
