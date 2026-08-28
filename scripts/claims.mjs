@@ -29,6 +29,8 @@ try {
   await run('sample-demo-isolated', async () => {
     const browser = await chromium.launch(); const context = await browser.newContext(); const page = await context.newPage();
     await page.addInitScript(() => localStorage.setItem('real:how-it-runs:state', 'keep'));
+    await page.goto(`${base}/?demo=1`, { waitUntil: 'networkidle' });
+    await page.getByText('Demo — sample data, nothing is saved').waitFor();
     await page.goto(`${base}/demo/`, { waitUntil: 'networkidle' });
     await page.getByText('Demo — sample data, nothing is saved').waitFor();
     if (await page.locator('#lever-settling').inputValue() !== '65') throw new Error('Demo was not seeded with realistic water settings.');
