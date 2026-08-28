@@ -32,7 +32,7 @@ Final build budgets: JS 22.33 kB raw / 8.28 kB gzip; CSS 22.58 kB raw / 5.92 kB 
 
 ## Deploy
 
-Push `main` to the configured repository. The static Azure work order deploys `dist/`; `public/staticwebapp.config.json` supplies production cache and 404 behavior.
+`main` was pushed to `origin` at `fa30659058f7f2c49974ccba0971ed5a4a75689c`, which is the configured static deployment trigger. The static Azure work order deploys `dist/`; `public/staticwebapp.config.json` supplies production cache and 404 behavior. The public endpoint still served the prior artifact when checked at 2026-08-28 10:05 UTC, so the external deployment had not completed within the 30-second polling window.
 
 ## Known gaps
 
