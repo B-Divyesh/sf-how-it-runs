@@ -39,6 +39,8 @@
 - Azure deployment ID: `d5c82031-a015-43fe-8394-547acb153e09`.
 - Live artifact shows `build polish-3`; <https://how-it-runs.sociobot.in> and
   the intentionally missing route were cold-checked after deployment.
+- SHA-256 comparison matched 13/13 deployed HTML, CSS, JavaScript, worker, and
+  icon files to `dist`; the live 404 also retained CSP and `nosniff` headers.
 
 Evidence files are in `.factory/evidence/polish-3/`. The full finding map is in
 `.factory/polish-3.md`.

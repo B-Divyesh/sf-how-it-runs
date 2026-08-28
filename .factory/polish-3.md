@@ -25,6 +25,8 @@ Live URL: <https://how-it-runs.sociobot.in>.
 - **Performance:** `.factory/evidence/polish-3/lighthouse-summary.json` records
   both runs. Each scored 100 Performance, Accessibility, Best Practices, and
   SEO. Live LCP was 1.2 s, TBT 30 ms, and CLS 0.
+- **Deployment identity:** SHA-256 checks matched 13/13 live runtime files to
+  `dist`; the live missing-route response retained CSP and `nosniff` headers.
 
 ## Review 3
 
