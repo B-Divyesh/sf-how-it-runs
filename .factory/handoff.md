@@ -46,6 +46,12 @@
   /tmp/how-it-runs-live-verify` passed in 1159 ms.
 - A separate fresh 390 × 844 live demo click showed the banner, water values
   65/65/60, and a settling control in the first viewport.
+- Lighthouse was invoked against the live site with the Playwright Chromium.
+  It wrote `/tmp/how-it-runs-lighthouse.json` but the browser target crashed
+  during Lighthouse’s final screenshot/BFCache collection, leaving no usable
+  category scores. This is recorded as an environment limitation, not used as
+  performance evidence; the completed live browser suite and asset budgets
+  above are the release checks.
 
 ## Known gaps
 
