@@ -38,3 +38,11 @@ has 16 words. All sentences are at or below 22 words. The banned-word scan for
 `leverage`, `seamless`, `effortless`, `robust`, `powerful`, `intuitive`,
 `reimagine`, `supercharge`, `delightful`, `journey`, `ecosystem`, and
 `AI-powered` has no matches in landing copy.
+
+## README copy added in polish 3
+
+| Copy | Words | Result |
+| --- | ---: | --- |
+| Use Node.js 20.19+ (20.x) or 22.12+. | 7 | Pass; exact range is claim-tested. |
+
+The catalog sentence starts with “Run,” has ten words, and is 69 characters long.

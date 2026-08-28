@@ -21,7 +21,7 @@ These simulations are not engineering, food-safety, or operational guidance.
 
 ## Run locally
 
-Use Node.js 20 or newer.
+Use Node.js 20.19+ (20.x) or 22.12+.
 
 ```sh
 npm ci
@@ -36,6 +36,7 @@ npm run build
 npm run preview -- --port 4173
 npm run verify:browser -- http://127.0.0.1:4173
 npm run test:claims
+npm run test:node-versions
 ```
 
 The production build creates the static site in `dist`, with `index.html` at its root.

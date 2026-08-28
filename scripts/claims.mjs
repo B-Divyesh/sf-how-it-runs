@@ -12,9 +12,14 @@ const claimIds = new Set([
   'sample-demo-isolated', 'leave-demo-discards-sample', 'free', 'offline-reload',
   'no-tracking-storage', 'private-url-settings', 'system-loop', 'keyboard-controls',
   'reduced-motion', 'real-routes', 'watch-mode', 'art-provenance', 'build-output',
-  'hosting-routes',
+  'hosting-routes', 'node-runtime-support',
 ]);
 if (requested && !claimIds.has(requested)) throw new Error(`Unknown claim id: ${requested}`);
+
+if (requested === 'node-runtime-support') {
+  const runtime = spawnSync(process.execPath, ['scripts/node-runtime-claim.mjs'], { stdio: 'inherit' });
+  process.exit(runtime.status ?? 1);
+}
 
 const build = spawnSync('npm', ['run', 'build'], { stdio: 'inherit' });
 if (build.status !== 0) process.exit(build.status ?? 1);
@@ -235,7 +240,8 @@ try {
 
   await run('real-routes', async () => {
     const browser = await chromium.launch();
-    const page = await (await browser.newContext()).newPage();
+    const context = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
+    const page = await context.newPage();
     const routes = [
       ['/demo/', 'Demo — How It Runs', 'https://how-it-runs.sociobot.in/demo/'],
       ['/systems/water/', 'Clean water works simulator — How It Runs', 'https://how-it-runs.sociobot.in/systems/water/'],
@@ -269,6 +275,27 @@ try {
     await page.goForward();
     await page.waitForURL(/\/systems\/water\//);
     await page.waitForFunction(() => document.querySelector('#route-announcement')?.textContent === 'Clean water works simulator opened.');
+
+    const shareCases = [
+      { id: 'water', selector: '#lever-settling', value: '50' },
+      { id: 'grid', selector: '#lever-generator', value: '50' },
+      { id: 'bakery', selector: '#lever-mix', value: '45' },
+    ];
+    for (const { id, selector, value } of shareCases) {
+      await page.goto(`${base}/systems/${id}/`, { waitUntil: 'networkidle' });
+      await page.locator(selector).fill(value);
+      await page.getByRole('button', { name: /Copy share link/ }).click();
+      const copied = await page.evaluate(() => navigator.clipboard.readText());
+      const sharedUrl = new URL(copied);
+      if (sharedUrl.origin !== base || sharedUrl.pathname !== `/systems/${id}/`) throw new Error(`${id} copied the wrong route: ${copied}`);
+      if ([...sharedUrl.searchParams.keys()].some((key) => !['set', 'fault'].includes(key))) throw new Error(`${id} copied an unexpected query key: ${copied}`);
+      if (sharedUrl.searchParams.get('set')?.split(',')[0] !== value) throw new Error(`${id} copied link omitted the changed setting: ${copied}`);
+
+      const reopened = await context.newPage();
+      await reopened.goto(copied, { waitUntil: 'networkidle' });
+      if (await reopened.locator(selector).inputValue() !== value) throw new Error(`${id} copied setting did not reopen in a fresh page.`);
+      await reopened.close();
+    }
     await browser.close();
     pass('real-routes');
   });
