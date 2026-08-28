@@ -24,6 +24,9 @@ const simulator = requireElement<HTMLElement>('#simulator');
 const toast = requireElement<HTMLDivElement>('#toast');
 const offlineBanner = requireElement<HTMLDivElement>('#offline-banner');
 const main = requireElement<HTMLElement>('#main');
+const pageTitle = requireElement<HTMLHeadingElement>('#page-title');
+const demoBanner = requireElement<HTMLElement>('#demo-banner');
+const routeAnnouncement = requireElement<HTMLDivElement>('#route-announcement');
 
 let watchTimer: number | undefined;
 let toastTimer: number | undefined;
@@ -70,9 +73,19 @@ document.querySelector<HTMLAnchorElement>('.skip-link')?.addEventListener('click
   window.requestAnimationFrame(() => main.focus({ preventScroll: true }));
 });
 
+function systemFromLocation(location = window.location): SystemId | null {
+  const match = location.pathname.match(/^\/systems\/(water|grid|bakery)\/?$/);
+  const fromPath = match?.[1] ?? new URLSearchParams(location.search).get('system');
+  return isSystemId(fromPath) ? fromPath : null;
+}
+
+function isDemoLocation(location = window.location): boolean {
+  return location.pathname === '/demo' || location.pathname === '/demo/' || new URLSearchParams(location.search).get('demo') === '1';
+}
+
 const params = new URLSearchParams(window.location.search);
-const requestedSystem = params.get('system');
-const initialId = isSystemId(requestedSystem) ? requestedSystem : null;
+const requestedSystem = params.get('system') || window.location.pathname.split('/')[2] || null;
+const initialId = systemFromLocation();
 const initialDefinition = initialId ? systemMap.get(initialId)! : null;
 
 function valuesFromUrl(definition: SystemDefinition | null): number[] {
@@ -96,6 +109,51 @@ const state: AppState = {
   watchStep: -1,
   flowPaused: false,
 };
+
+let demoMode = isDemoLocation();
+
+function setDocumentRoute(announce = false): void {
+  const definition = state.systemId ? systemMap.get(state.systemId)! : null;
+  const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  const description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+  if (definition) {
+    pageTitle.textContent = `${definition.title} simulator`;
+    document.title = `${definition.title} simulator — How It Runs`;
+    if (canonical) canonical.href = `https://how-it-runs.sociobot.in/systems/${definition.id}/`;
+    if (description) description.content = `Run the ${definition.title.toLowerCase()} simulation with clear controls and live results.`;
+  } else if (demoMode) {
+    pageTitle.textContent = 'Run everyday systems in five minutes';
+    document.title = 'Demo — How It Runs';
+    if (canonical) canonical.href = 'https://how-it-runs.sociobot.in/demo/';
+    if (description) description.content = 'Try the seeded water simulation with sample settings.';
+  } else {
+    pageTitle.textContent = 'Run everyday systems in five minutes';
+    document.title = 'How It Runs — Everyday system simulators';
+    if (canonical) canonical.href = 'https://how-it-runs.sociobot.in/';
+  }
+  demoBanner.hidden = !demoMode;
+  if (announce) {
+    routeAnnouncement.textContent = definition ? `${definition.title} simulator opened.` : demoMode ? 'Sample demo opened.' : 'How It Runs home opened.';
+    pageTitle.focus({ preventScroll: true });
+  }
+}
+
+function storeDemoState(): void {
+  if (!demoMode) return;
+  sessionStorage.setItem('demo:how-it-runs:state', JSON.stringify({ systemId: state.systemId, values: state.values, fault: state.fault }));
+}
+
+function seedDemo(): void {
+  const definition = systemMap.get('water')!;
+  state.systemId = 'water';
+  state.values = [65, 65, 60];
+  state.fault = false;
+  state.faultUnlocked = true;
+  state.watch = false;
+  state.watchStep = -1;
+  state.flowPaused = false;
+  storeDemoState();
+}
 
 function showToast(message: string): void {
   window.clearTimeout(toastTimer);
@@ -135,10 +193,11 @@ function renderSimulator(announce = false): void {
     simulator.innerHTML = `
       <div class="empty-stage" id="empty-stage">
         <span class="empty-symbol" aria-hidden="true">↟</span>
-        <h2>Your control desk is ready</h2>
-        <p>Choose one of the three routes above to start. Each trip takes about five minutes.</p>
+        <h2>Your controls appear here</h2>
+        <p>Choose water, power, or bakery to open a simulation.</p>
       </div>`;
     updateUrl();
+    setDocumentRoute();
     return;
   }
 
@@ -244,19 +303,28 @@ function renderSimulator(announce = false): void {
       <details><summary>What the tiny model leaves out</summary><ul>${definition.facts.map((fact) => `<li>${fact}</li>`).join('')}</ul></details>
     </div>`;
 
-  if (announce) simulator.focus({ preventScroll: true });
+  if (announce) pageTitle.focus({ preventScroll: true });
   else restoreSimulatorFocus(focus);
   updateUrl();
+  setDocumentRoute();
+  storeDemoState();
 }
 
 function updateUrl(): void {
   const next = new URL(window.location.href);
+  const pathSystem = next.pathname.match(/^\/systems\//);
+  if (!demoMode && state.systemId && !pathSystem) next.pathname = `/systems/${state.systemId}/`;
+  if (demoMode) {
+    next.pathname = '/demo/';
+    next.searchParams.set('demo', '1');
+  }
   if (state.systemId) {
-    next.searchParams.set('system', state.systemId);
+    if (demoMode) next.searchParams.set('system', state.systemId);
+    else next.searchParams.delete('system');
     next.searchParams.set('set', state.values.join(','));
     state.fault ? next.searchParams.set('fault', '1') : next.searchParams.delete('fault');
   } else {
-    next.search = '';
+    next.search = demoMode ? 'demo=1' : '';
   }
   history.replaceState(null, '', next);
 }
@@ -270,11 +338,11 @@ function selectSystem(id: SystemId): void {
   state.faultUnlocked = false;
   state.watchStep = -1;
   state.flowPaused = false;
+  if (!demoMode) history.pushState(null, '', `/systems/${id}/`);
   renderRoutes();
-  renderSimulator();
+  renderSimulator(true);
   simulator.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
-  simulator.setAttribute('tabindex', '-1');
-  simulator.focus({ preventScroll: true });
+  pageTitle.focus({ preventScroll: true });
 }
 
 function applyWatchStep(step: number): void {
@@ -364,8 +432,9 @@ simulator.addEventListener('click', (event) => {
       state.systemId = null;
       state.values = [];
       state.fault = false;
+      if (!demoMode) history.pushState(null, '', '/');
       renderRoutes();
-      renderSimulator();
+      renderSimulator(true);
       document.querySelector('#routes')?.scrollIntoView({ behavior: 'smooth' });
       break;
     }
@@ -376,11 +445,47 @@ function updateOnlineState(): void {
   offlineBanner.hidden = navigator.onLine;
 }
 
+demoBanner.addEventListener('click', (event) => {
+  const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-demo-action="reset"]');
+  if (!button) return;
+  seedDemo();
+  renderRoutes();
+  renderSimulator(true);
+  showToast('Sample water system reset.');
+});
+
+function restoreFromLocation(announce = true): void {
+  demoMode = isDemoLocation();
+  const id = systemFromLocation();
+  const definition = id ? systemMap.get(id)! : null;
+  if (demoMode && !id) {
+    seedDemo();
+  } else {
+    state.systemId = id;
+    state.values = valuesFromUrl(definition);
+    state.fault = params.get('fault') === '1';
+    state.faultUnlocked = state.fault;
+    state.watch = false;
+    state.watchStep = -1;
+  }
+  renderRoutes();
+  renderSimulator(announce);
+}
+
+window.addEventListener('popstate', () => {
+  const currentParams = new URLSearchParams(window.location.search);
+  params.forEach((_value, key) => params.delete(key));
+  currentParams.forEach((value, key) => params.set(key, value));
+  restoreFromLocation(true);
+});
+
 window.addEventListener('online', updateOnlineState);
 window.addEventListener('offline', updateOnlineState);
 updateOnlineState();
+if (demoMode && !initialId) seedDemo();
 renderRoutes();
 renderSimulator();
+setDocumentRoute();
 
 if (requestedSystem !== null && !initialId) {
   showToast('That route does not exist, so we brought you back to departures.');

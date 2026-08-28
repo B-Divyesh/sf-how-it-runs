@@ -32,7 +32,7 @@ const homeResponse = await page.goto(base, { waitUntil: 'networkidle' });
 if (!homeResponse?.headers()['cache-control']?.includes('no-cache')) throw new Error('HTML shell must revalidate instead of being immutable.');
 if (await page.locator('h1').count() !== 1) throw new Error('Expected exactly one h1.');
 await page.keyboard.press('Tab');
-if (await page.locator(':focus').innerText() !== 'Skip to the simulator') throw new Error('Skip link is not the first keyboard stop.');
+if (await page.locator(':focus').innerText() !== 'Skip to main content') throw new Error('Skip link is not the first keyboard stop.');
 await page.keyboard.press('Enter');
 await page.waitForFunction(() => document.activeElement?.id === 'main');
 if (!page.url().endsWith('#main')) throw new Error('Skip link did not preserve its main-content fragment.');
@@ -54,13 +54,13 @@ for (const [system, settings] of [
   ['grid', '70,40,30'],
   ['bakery', '60,70,60'],
 ]) {
-  await page.goto(`${base}/?system=${system}&set=${settings}`, { waitUntil: 'networkidle' });
+  await page.goto(`${base}/systems/${system}/?set=${settings}`, { waitUntil: 'networkidle' });
   await page.getByText('System steady', { exact: true }).waitFor();
   const fault = page.locator('[data-action="fault"]');
   if (await fault.isDisabled()) throw new Error(`${system} fault did not unlock at its documented target.`);
 }
 
-await page.goto(`${base}/?system=water&set=66.6,65,60`, { waitUntil: 'networkidle' });
+await page.goto(`${base}/systems/water/?set=66.6,65,60`, { waitUntil: 'networkidle' });
 const importedSettling = page.locator('#lever-settling');
 const importedSettlingOutput = page.locator('#value-settling');
 if (await importedSettling.inputValue() !== '65' || await importedSettlingOutput.innerText() !== '65%') {
@@ -85,7 +85,7 @@ await page.getByRole('button', { name: /Pause watch mode/ }).waitFor();
 await page.getByRole('button', { name: /Pause watch mode/ }).click();
 await assertMobileTouchTargets();
 
-await page.goto(`${base}/?system=water&set=65,65,60`, { waitUntil: 'networkidle' });
+await page.goto(`${base}/systems/water/?set=65,65,60`, { waitUntil: 'networkidle' });
 const watchControl = page.getByRole('button', { name: 'Watch it run' });
 await watchControl.focus();
 await page.keyboard.press('Enter');
@@ -100,12 +100,14 @@ if (!await page.getByRole('button', { name: 'Watch it run' }).evaluate((button) 
   throw new Error('Watch mode did not retain keyboard focus after pausing with Space.');
 }
 
-await page.goto(`${base}/?system=does-not-exist&set=1,2,3`, { waitUntil: 'networkidle' });
-await page.getByRole('heading', { name: 'Your control desk is ready' }).waitFor();
-const recoveredUrl = new URL(page.url());
-if (recoveredUrl.search || recoveredUrl.hash) {
-  throw new Error(`Unknown system recovery retained an invalid share URL: ${page.url()}`);
-}
+const unknown = await page.goto(`${base}/not-a-real-route-qa`, { waitUntil: 'networkidle' });
+if (unknown?.status() !== 404 || !await page.getByRole('heading', { name: 'This page does not exist.' }).count()) throw new Error('Unknown route did not render the designed 404 response.');
+// Chromium reports the intentional document 404 as a console resource error.
+errors.splice(0);
+
+await page.goto(`${base}/demo/`, { waitUntil: 'networkidle' });
+await page.getByText('Demo — sample data, nothing is saved').waitFor();
+if (await page.locator('#lever-settling').inputValue() !== '65') throw new Error('Demo did not open the seeded water simulation.');
 
 const horizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
 if (horizontalOverflow) throw new Error('Page has horizontal overflow at 390px.');
@@ -125,7 +127,7 @@ if (!await page.evaluate(() => Boolean(navigator.serviceWorker.controller))) {
 }
 await context.setOffline(true);
 await page.reload({ waitUntil: 'domcontentloaded' });
-await page.getByRole('heading', { name: 'Clean water works' }).first().waitFor();
+await page.getByRole('heading', { name: 'Clean water works simulator' }).first().waitFor();
 const offlineModule = await page.evaluate(async (url) => {
   const response = await fetch(url);
   return {
@@ -145,7 +147,8 @@ console.log(JSON.stringify({
   faultUnlocked: true,
   watchModePaused: true,
   enterThenSpaceWatchControl: true,
-  unknownRouteUrlNormalized: true,
+  styled404: true,
+  demoSeeded: true,
   fractionalUrlStateNormalized: true,
   mobileOverflow: false,
   offlineReload: true,

@@ -33,6 +33,9 @@ function fileFor(pathname) {
   const relative = decoded.endsWith('/') ? `${decoded}index.html` : decoded;
   const target = normalize(join(root, relative));
   if (!target.startsWith(`${root}/`) && target !== root) return null;
+  if (existsSync(target)) return target;
+  const directoryIndex = normalize(join(root, decoded, 'index.html'));
+  if (directoryIndex.startsWith(`${root}/`) && existsSync(directoryIndex)) return directoryIndex;
   return target;
 }
 
@@ -62,13 +65,15 @@ const server = createServer(async (request, response) => {
     return response.end('Bad request');
   }
 
-  // Match Static Web Apps: paths excluded from its navigation fallback remain 404.
-  const excluded = config.navigationFallback?.exclude?.some((pattern) => matches(pattern, pathname));
-  if (excluded) {
-    response.writeHead(404, headersFor(pathname));
-    return response.end('Not found');
+  const notFound = join(root, '404.html');
+  if (existsSync(notFound)) {
+    const details = await stat(notFound);
+    response.writeHead(404, { ...headersFor(pathname), 'Content-Length': details.size, 'Content-Type': 'text/html; charset=utf-8' });
+    if (request.method === 'HEAD') return response.end();
+    return createReadStream(notFound).pipe(response);
   }
-  return sendFile(response, join(root, 'index.html'), '/', request.method === 'HEAD');
+  response.writeHead(404, headersFor(pathname));
+  return response.end('Not found');
 });
 
 server.listen(port, host, () => {

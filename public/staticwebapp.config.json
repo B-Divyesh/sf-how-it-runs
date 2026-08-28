@@ -1,7 +1,9 @@
 {
-  "navigationFallback": {
-    "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/*.css", "/*.js", "/*.webp", "/*.avif", "/privacy/*", "/terms/*"]
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/404.html",
+      "statusCode": 404
+    }
   },
   "routes": [
     {

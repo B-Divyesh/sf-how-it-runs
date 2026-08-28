@@ -37,8 +37,8 @@ self.addEventListener('fetch', (event) => {
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
-        .then((response) => cacheResponse('/', response))
-        .catch(() => caches.match('/')),
+        .then((response) => cacheResponse(event.request, response))
+        .catch(async () => (await caches.match(event.request)) || caches.match('/')),
     );
     return;
   }

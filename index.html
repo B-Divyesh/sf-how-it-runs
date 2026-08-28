@@ -4,32 +4,42 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#102b3a" />
+    <link rel="canonical" href="https://how-it-runs.sociobot.in/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta name="description" content="Try five-minute, kid-safe simulations of water treatment, a power grid, and a bakery line." />
-    <meta property="og:title" content="How It Runs — Try the systems behind everyday life" />
-    <meta property="og:description" content="Turn the levers, watch the flow, and discover the people who keep everyday systems running." />
-    <title>How It Runs — 5-minute system simulators for curious kids</title>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="description" content="Run water, power, and bakery simulations with clear controls and visible results." />
+    <meta property="og:title" content="How It Runs — Everyday system simulators" />
+    <meta property="og:description" content="Run water, power, and bakery systems with sample settings." />
+    <meta property="og:image" content="https://how-it-runs.sociobot.in/social-card.jpg" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="How It Runs — Everyday system simulators" />
+    <meta name="twitter:description" content="Run water, power, and bakery systems with sample settings." />
+    <meta name="twitter:image" content="https://how-it-runs.sociobot.in/social-card.jpg" />
+    <title>How It Runs — Everyday system simulators</title>
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to the simulator</a>
+    <a class="skip-link" href="#main">Skip to main content</a>
     <header class="site-header">
       <a class="brand" href="/">
         <span class="brand-mark" aria-hidden="true">HIR</span>
-        <span>How it runs</span>
+        <span>How It Runs</span>
       </a>
       <nav aria-label="Main navigation">
-        <a href="#routes">Pick a system</a>
-        <a href="#about">For grown-ups</a>
+        <a href="/demo/">Demo</a>
+        <a href="#routes">Systems</a>
+        <a href="/privacy/">Privacy</a>
       </nav>
     </header>
 
     <main id="main" tabindex="-1">
       <section class="hero" aria-labelledby="page-title">
         <div class="hero-copy">
-          <p class="eyebrow">A five-minute field trip</p>
-          <h1 id="page-title">The hidden systems<br /><em>behind every day.</em></h1>
-          <p class="hero-intro">Turn the levers. Follow the flow. Meet the people who keep water clean, lights on, and bread moving.</p>
-          <a class="button button-primary" href="#routes">Choose your route <span aria-hidden="true">↓</span></a>
+          <p class="eyebrow">Browser simulations for everyday systems</p>
+          <h1 id="page-title" tabindex="-1">Run everyday systems in five minutes</h1>
+          <p class="hero-intro">For kids and grown-ups who want to see how water, power, and bread reach a neighborhood.</p>
+          <div class="hero-actions"><a class="button button-primary" href="/demo/">Try it with sample data <span aria-hidden="true">→</span></a><span>Opens a working water system with realistic settings.</span></div>
+          <ul class="hero-facts" aria-label="Product facts"><li>Free.</li><li>Works offline after the first visit.</li><li>No account; settings stay in the URL.</li></ul>
         </div>
         <picture class="hero-art">
           <source type="image/avif" srcset="/hero-768.avif 768w, /hero-1280.avif 1280w" sizes="(max-width: 760px) 100vw, 58vw" />
@@ -41,9 +51,9 @@
 
       <section class="routes-section" id="routes" aria-labelledby="routes-title">
         <div class="section-heading">
-          <p class="eyebrow">Departures every minute</p>
-          <h2 id="routes-title">Pick a system to run</h2>
-          <p>No score. No timer. Just make a working system—and then see what happens when something changes.</p>
+          <p class="eyebrow">Choose a system to simulate</p>
+          <h2 id="routes-title">Open a system</h2>
+          <p>Each simulation has controls, five stages, live results, a fault, and a worker’s job note.</p>
         </div>
         <div class="route-list" id="route-list" aria-label="Available systems"></div>
       </section>
@@ -51,38 +61,54 @@
       <section id="simulator" class="simulator-section" aria-label="Selected system simulator">
         <div class="empty-stage" id="empty-stage">
           <span class="empty-symbol" aria-hidden="true">↟</span>
-          <h2>Your control desk is ready</h2>
-          <p>Choose one of the three routes above to start. Each trip takes about five minutes.</p>
+          <h2>Your controls appear here</h2>
+          <p>Choose water, power, or bakery to open a simulation.</p>
         </div>
+      </section>
+
+      <section class="how-it-works" aria-labelledby="how-title">
+        <p class="eyebrow">How it works</p>
+        <h2 id="how-title">Run a system in three steps</h2>
+        <ol>
+          <li><strong>Open</strong><span>Choose water, power, or bakery.</span></li>
+          <li><strong>Adjust</strong><span>Move the controls and read the live results.</span></li>
+          <li><strong>Respond</strong><span>Reach the steady zone, then try a fault.</span></li>
+        </ol>
       </section>
 
       <section class="grownups" id="about" aria-labelledby="grownups-title">
         <div>
-          <p class="eyebrow">The grown-up noticeboard</p>
-          <h2 id="grownups-title">Simple on purpose.<br />Truthful about the trade-offs.</h2>
+          <p class="eyebrow">For parents and teachers</p>
+          <h2 id="grownups-title">What each simulation leaves out</h2>
         </div>
         <div class="grownups-copy">
-          <p>These are intuition-builders, not engineering tools. Each model keeps the important relationship—like speed versus quality—while leaving out real-world detail. The “Who does this?” notes connect every lever to a job.</p>
+          <p>These simulations show how one control changes several results. They are not engineering tools. Each system shows three controls and five stages.</p>
           <details>
             <summary>How to use this with a child or class</summary>
             <p>First ask for a prediction. Move one lever, name what changed, then try the fault. In watch mode, pause after each caption and ask what you would do next.</p>
           </details>
           <details>
-            <summary>Where does progress go?</summary>
-            <p>Nowhere. There are no accounts, analytics, cookies, or saved profiles. A share link keeps only the current simulator settings in its URL.</p>
+            <summary>Your settings are not saved</summary>
+            <p>There are no accounts, analytics, cookies, or saved profiles. A share link contains only the current system settings.</p>
           </details>
         </div>
       </section>
     </main>
 
+    <aside class="demo-banner" id="demo-banner" aria-label="Demo controls" hidden>
+      <strong>Demo — sample data, nothing is saved</strong>
+      <span><button type="button" data-demo-action="reset">Reset demo</button><a href="/">Start for real</a></span>
+    </aside>
+    <div class="route-announcement" id="route-announcement" aria-live="polite" aria-atomic="true"></div>
+
     <div class="offline-banner" id="offline-banner" role="status" hidden>
-      <strong>You’re offline.</strong> The control room still works; sharing needs a connection.
+      <strong>You’re offline.</strong> The current simulation still works. Copying a link may need a connection.
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
     <footer>
-      <p><strong>How It Runs</strong> · A free, kid-safe explorable by Sociobot.</p>
-      <p class="footer-links"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><span>Original generated panorama; diagrams are handmade.</span></p>
+      <p><strong>How It Runs</strong> · A free browser simulator for kids and grown-ups.</p>
+      <p class="footer-links"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><span>Built by Param Factory · build b2914d5-r1</span></p>
     </footer>
     <script type="module" src="/src/main.ts"></script>
   </body>
