@@ -1,0 +1,29 @@
+{
+  "url": "https://how-it-runs.sociobot.in",
+  "viewport": "390x844",
+  "firstScreen": {
+    "headline": {"top": 175, "bottom": 355, "visible": true},
+    "audience": {"top": 381, "bottom": 465, "visible": true},
+    "sampleActionAndResult": {"top": 501, "bottom": 603, "visible": true},
+    "threeFacts": {"top": 629, "bottom": 700, "visible": true}
+  },
+  "demo": {
+    "banner": {"top": 0, "bottom": 111, "visible": true},
+    "settlingControl": {"top": 613, "bottom": 657, "visible": true, "value": 65},
+    "resetValue": 65,
+    "realStorageBeforeAndAfter": "untouched",
+    "demoStorageAfterLeave": null
+  },
+  "systemTitles": {
+    "water": "How It Runs — Clean water works simulator",
+    "grid": "How It Runs — Neighborhood power grid simulator",
+    "bakery": "How It Runs — Morning bakery line simulator",
+    "rawTitleOpenGraphTwitterMatch": true,
+    "executedTitleOpenGraphTwitterMatch": true
+  },
+  "routeFocus": true,
+  "backForwardPath": "/systems/water/",
+  "requestOrigins": ["https://how-it-runs.sociobot.in"],
+  "cookies": [],
+  "consoleErrors": []
+}

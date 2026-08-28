@@ -1,0 +1,53 @@
+{
+  "candidate": "0e8d9f17f1ece8d7cffa8c25fdbf734ada065876",
+  "cleanClone": "/tmp/how-it-runs-polish4.5aqWY1/repo",
+  "install": {"command": "npm ci", "result": "pass", "vulnerabilities": 0},
+  "unit": {"command": "npm test", "result": "pass", "files": 1, "tests": 8},
+  "build": {"command": "npm run build", "result": "pass", "output": "dist/index.html"},
+  "claims": {
+    "result": "15/15 pass as separate manifest commands",
+    "ids": [
+      "sample-demo-isolated",
+      "leave-demo-discards-sample",
+      "free",
+      "offline-reload",
+      "no-tracking-storage",
+      "private-url-settings",
+      "system-loop",
+      "keyboard-controls",
+      "reduced-motion",
+      "real-routes",
+      "watch-mode",
+      "art-provenance",
+      "build-output",
+      "hosting-routes",
+      "node-runtime-support"
+    ],
+    "nodeRuntimeSupport": ["20.19.0", "22.12.0", "24"]
+  },
+  "browser": {
+    "local": "pass",
+    "live": "pass",
+    "axeViolations": 0,
+    "seriousOrCritical": 0,
+    "consoleErrors": 0,
+    "internalLinksChecked": 4,
+    "offlineReload": true,
+    "mobileTouchTargets": true,
+    "desktopFactsInFirstScreen": true,
+    "systemControlInFirstMobileScreen": true
+  },
+  "budgets": {
+    "javascriptBytes": 22496,
+    "javascriptGzipBytes": 8292,
+    "cssBytes": 24490,
+    "cssGzipBytes": 6311,
+    "mobileHeroAvifBytes": 34397,
+    "mobileHeroWebpBytes": 58514
+  },
+  "deployment": {
+    "resource": "sf-how-it-runs",
+    "url": "https://how-it-runs.sociobot.in",
+    "artifactIdentity": "21/21 public runtime artifacts matched dist by SHA-256"
+  }
+}
