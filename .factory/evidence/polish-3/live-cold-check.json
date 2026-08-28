@@ -1,0 +1,91 @@
+{
+  "base": "https://how-it-runs.sociobot.in",
+  "checkedAt": "2026-08-28T13:01:29.450Z",
+  "firstScreens": {
+    "mobile": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "allRequiredCopyVisible": true,
+      "horizontalOverflow": false,
+      "consoleErrors": 0
+    },
+    "desktop": {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "allRequiredCopyVisible": true,
+      "horizontalOverflow": false,
+      "consoleErrors": 0
+    }
+  },
+  "demo": {
+    "oneClick": true,
+    "directQuery": true,
+    "seed": "65,65,60",
+    "reset": true,
+    "isolation": true,
+    "leaveClearsOnlyDemoKey": true
+  },
+  "shares": {
+    "water": {
+      "copied": "https://how-it-runs.sociobot.in/systems/water/?set=50%2C75%2C35",
+      "reopenedValue": "50"
+    },
+    "grid": {
+      "copied": "https://how-it-runs.sociobot.in/systems/grid/?set=50%2C20%2C10",
+      "reopenedValue": "50"
+    },
+    "bakery": {
+      "copied": "https://how-it-runs.sociobot.in/systems/bakery/?set=45%2C55%2C80",
+      "reopenedValue": "45"
+    }
+  },
+  "routes": {
+    "/": {
+      "status": 200,
+      "title": "How It Runs — Everyday system simulators"
+    },
+    "/demo/": {
+      "status": 200,
+      "title": "Demo — How It Runs"
+    },
+    "/systems/water/": {
+      "status": 200,
+      "title": "Clean water works simulator — How It Runs"
+    },
+    "/systems/grid/": {
+      "status": 200,
+      "title": "Neighborhood power grid simulator — How It Runs"
+    },
+    "/systems/bakery/": {
+      "status": 200,
+      "title": "Morning bakery line simulator — How It Runs"
+    },
+    "/privacy/": {
+      "status": 200,
+      "title": "Privacy — How It Runs"
+    },
+    "/terms/": {
+      "status": 200,
+      "title": "Terms — How It Runs"
+    },
+    "/cold-missing-polish-3": {
+      "status": 404,
+      "designed": true
+    },
+    "history": {
+      "back": true,
+      "forward": true,
+      "headingFocus": true,
+      "announcement": true
+    }
+  },
+  "privacy": {
+    "sameOriginRequests": 16,
+    "thirdPartyRequests": 0,
+    "cookies": 0
+  }
+}
